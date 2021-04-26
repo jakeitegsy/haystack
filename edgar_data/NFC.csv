@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+NFC,2018-06-30,False,Q1,2018,10-Q,0.0,,-13715.0,0.0,0.0,0.0,11776192.0,2947442.0,11764907.0,2821223.0,11285.0,-347.0,,2821570.0,,,
+NFC,2018-09-30,False,Q3,2018,10-Q,,-180794.0,1258418.0,0.030000000000000002,0.030000000000000002,0.0,291786093.0,2846881.0,306808.0,2734579.0,5000005.0,-223528.0,-287500000.0,290458107.0,,,

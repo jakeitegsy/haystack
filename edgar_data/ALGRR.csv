@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+ALGR,2018-09-30,False,Q3,2018,10-Q,,129129.0,411070.0,-0.02,-0.02,0.0,150742793.0,570010.0,186459.0,501248.0,5000004.0,-144718.0,-149500000.0,150142421.0,,,
+ALGRU,2018-06-30,False,Q2,2018,10-Q,,,,,,0.0,348375.0,,324413.0,8698.0,23962.0,-55.0,,5208.0,,,

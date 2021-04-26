@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+TWLV,2018-09-30,False,Q3,2018,10-Q,,-205416.0,874795.0,0.03,0.03,0.0,208494683.0,372060.0,141301.0,333518.0,5000002.0,-134590.0,-206999990.0,207466598.0,,,
+TWLV,2018-06-30,False,Q2,2018,10-Q,,-6424.0,35998.0,0.01,0.01,0.0,207541562.0,499150.0,62975.0,464150.0,5000007.0,-59817.0,-206999990.0,207522457.0,,,

@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+APTO,2018-12-31,False,FY,2018,10-K,,,-28868000.0,-0.86,-0.86,0.0,16870000.0,16486000.0,2789000.0,15299000.0,14081000.0,-23207000.0,12000.0,27871000.0,,,329000.0

@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+URGN,2018-12-31,False,FY,2018,10-K,1128000.0,-77180000.0,-75657000.0,-4.8,-4.8,0.0,103559000.0,102243000.0,13465000.0,101318000.0,90094000.0,-37334000.0,35287000.0,66421000.0,0.0,,560000.0

@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+REZI,2018-09-30,False,Q3,2018,10-Q,1200000000.0,131000000.0,311000000.0,2.53,2.53,0.0,4742000000.0,1668000000.0,1400000000.0,184000000.0,2685000000.0,375000000.0,-56000000.0,-186000000.0,,2638000000.0,63000000.0

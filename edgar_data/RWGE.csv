@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+RWGE,2018-09-30,False,Q3,2018,10-Q,0.0,,1231516.0,0.030000000000000002,0.030000000000000002,0.0,304505491.0,750925.0,365666.0,623592.0,5000005.0,-289198.0,,-512573.0,,,
+RWGE,2018-03-31,False,Q1,2018,10-Q,0.0,,615184.0,-0.02,-0.02,0.0,302100117.0,924424.0,204324.0,687259.0,5000003.0,-228731.0,,-509373.0,,,
+RWGE,2018-06-30,False,Q2,2018,10-Q,0.0,,1012516.0,0.02,0.02,0.0,303216178.0,844444.0,307869.0,662195.0,5000009.0,-250595.0,,-512573.0,,,

@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+GTX,2018-12-31,False,FY,2018,10-K,3375000000.0,,1180000000.0,15.93,15.86,0.0,2104000000.0,1189000000.0,1492000000.0,196000000.0,-2593000000.0,373000000.0,192000000.0,-658000000.0,1628000000.0,193000000.0,95000000.0

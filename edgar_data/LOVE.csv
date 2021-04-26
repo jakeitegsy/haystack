@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+LOVE,2018-11-04,False,Q3,2019,10-Q,41685929.0,-2691480.0,-2899537.0,-0.22,-0.22,0.0,96771891.0,78469777.0,25072685.0,44683851.0,70253381.0,-14223536.0,-8876714.0,58608150.0,,143562.0,8436529.0
+LOVE,2018-08-05,False,Q2,2019,10-Q,33249012.0,-6819561.0,-33700679.0,-3.71,-3.71,0.0,95085760.0,78280819.0,21542385.0,48212163.0,72228260.0,-13294833.0,-6277105.0,58608150.0,,143562.0,6033856.0

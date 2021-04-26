@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+CI,2018-12-31,False,FY,2018,10-K,48650000000.0,4160000000.0,2637000000.0,10.69,10.54,0.0,153226000000.0,20430000000.0,31895000000.0,3855000000.0,41035000000.0,3770000000.0,-26378000000.0,23515000000.0,,44505000000.0,528000000.0

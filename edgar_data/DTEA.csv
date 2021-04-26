@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+DTEA,2018-08-04,False,Q2,2018,10-Q,40167000.0,,,-0.39,-0.39,0.0,,,,39623000.0,,,,,,,
+DTEA,2018-05-05,False,Q1,2018,10-Q,45786000.0,,,-0.05,-0.05,0.0,,,,53868000.0,,,,,,,
+DTEA,2018-02-03,False,FY,2017,10-K,224015000.0,,,-1.11,-1.11,0.0,,,,63484000.0,,,,,,,

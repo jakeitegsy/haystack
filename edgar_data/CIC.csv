@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+CIC,2018-12-31,False,FY,2018,10-K,240000.0,-1553651.0,186297.0,0.02,0.02,0.0,408197214.0,469596.0,90875.0,468253.0,5000005.0,-1533672.0,1500000.0,,,,
+CIC,2018-09-30,False,Q3,2018,10-Q,60000.0,-324052.0,473572.0,0.04,0.04,0.0,406445213.0,60058.0,106557.0,21360.0,5000006.0,-1230565.0,750000.0,,,,
+CIC,2018-06-30,False,Q2,2018,10-Q,60000.0,-491575.0,293621.0,0.02,0.02,0.0,405088659.0,458221.0,180668.0,394323.0,5000005.0,-857602.0,750000.0,,,,

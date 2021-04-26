@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+TMCX,2018-09-30,False,Q3,2018,10-Q,,-223597.0,1225421.0,-0.009999999999999995,-0.009999999999999995,0.0,354841980.0,895586.0,156465.0,803712.0,5000001.0,-866307.0,-351349750.0,353019769.0,,,
+TMCX,2018-03-31,False,Q1,2018,10-Q,,,-814.0,0.0,0.0,0.0,491272.0,27750.0,467086.0,27750.0,24186.0,0.0,,27750.0,,,
+TMCX,2018-06-30,False,Q2,2018,10-Q,,-182192.0,441139.0,0.0,0.0,0.0,353717021.0,1041286.0,256927.0,955583.0,5000001.0,-169734.0,-351900000.0,353025317.0,,,

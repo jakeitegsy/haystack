@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+SPAQ,2018-09-30,False,Q3,2018,10-Q,,,359089.0,0.01,0.01,0.0,555021306.0,1849574.0,465347.0,1559467.0,5000009.0,-641271.0,-552000000.0,554175738.0,,,

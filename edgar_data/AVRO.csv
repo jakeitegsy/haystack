@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+AVRO,2018-06-30,False,Q2,2018,10-Q,,-9547000.0,-10507000.0,-2.98,-2.98,0.0,158730000.0,156147000.0,9631000.0,155015000.0,148318000.0,-14229000.0,-400000.0,163681000.0,,,424000.0
+AVRO,2018-09-30,False,Q3,2018,10-Q,,-12232000.0,-11591000.0,-0.49,-0.49,0.0,143272000.0,140078000.0,5427000.0,138577000.0,137109000.0,-26214000.0,-1598000.0,160426000.0,,,1339000.0

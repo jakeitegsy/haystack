@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+ETTX,2018-09-30,False,Q3,2018,10-Q,,-10161000.0,-17615000.0,-20.33,-20.33,0.0,100060000.0,99343000.0,9430000.0,94021000.0,90483000.0,-27787000.0,-322000.0,67029000.0,,,322000.0

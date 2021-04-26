@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+CBMB,2018-06-30,False,Q2,2018,10-Q,1952026.0,,216611.0,,,0.0,184176588.0,,,714877.0,22017820.0,1174104.0,-224481.0,6013870.0,0.0,,74529.0
+CBMB,2018-09-30,False,Q3,2018,10-Q,2107934.0,,324212.0,0.33,0.33,0.0,217487230.0,,,881939.0,60219759.0,1917660.0,-2109851.0,38856103.0,0.0,,112111.0

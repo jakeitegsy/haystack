@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+KREF,2017-06-30,False,Q2,2017,10-Q,58000.0,,14081000.0,0.3,0.3,0.53,6630373000.0,,,57013000.0,1072693000.0,22625000.0,-357967000.0,296909000.0,5529183000.0,,0.0

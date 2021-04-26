@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+BNGO,2018-09-30,False,Q3,2018,10-Q,2828704.0,-5968840.0,-4926097.0,-0.63,-0.63,0.0,30669804.0,28620548.0,5514646.0,20657038.0,15235022.0,-15853679.0,-319885.0,35808706.0,9008337.0,,319885.0

@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+UROV,2018-12-31,False,Q3,2019,10-Q,,,-26441000.0,-0.87,-0.87,0.0,112252000.0,110997000.0,,95613000.0,102158000.0,-85065000.0,-193000.0,174521000.0,,,193000.0
+UROV,2018-09-30,False,Q2,2019,10-Q,,,-24642000.0,-1.23,-1.23,0.0,16288000.0,15617000.0,,1659000.0,-6727000.0,-44344000.0,-162000.0,38971000.0,,,162000.0

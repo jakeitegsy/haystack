@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+DFBHU,2018-03-31,False,Q1,2018,10-Q,,-72527.0,220333.0,0.1,0.1,0.0,251634961.0,1270052.0,75833.0,1070677.0,5000008.0,-380187.0,-250000000.0,251331043.0,,,
+DFBHU,2018-09-30,False,Q3,2018,10-Q,,-444751.0,518317.0,0.03,0.03,0.0,253147373.0,1086753.0,380098.0,846716.0,5000005.0,-1269904.0,-249334244.0,251331043.0,,,
+DFBHU,2018-06-30,False,Q2,2018,10-Q,,-234405.0,689830.0,0.03,0.03,0.0,252346678.0,1276452.0,97720.0,988718.0,5000008.0,-913468.0,-249548678.0,251331043.0,,,

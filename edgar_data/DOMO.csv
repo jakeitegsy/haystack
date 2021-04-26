@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+DOMO,2018-10-31,False,Q3,2019,10-Q,36844000.0,-29975000.0,-32545000.0,-1.24,-1.24,0.0,296530000.0,252662000.0,123712000.0,205999000.0,66859000.0,-103665000.0,,252360000.0,,9478000.0,4673000.0
+DOMO,2018-07-31,False,Q2,2019,10-Q,34267000.0,-43379000.0,-46384000.0,-4.41,-4.41,0.0,325769000.0,281712000.0,124954000.0,238802000.0,94498000.0,-72983000.0,,253006000.0,,9478000.0,3205000.0

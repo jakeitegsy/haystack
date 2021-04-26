@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+ARVN,2018-09-30,False,Q3,2018,10-Q,3375264.0,-14058846.0,-125438281.0,-62.38,-62.38,0.0,98886058.0,95518056.0,19847631.0,6191004.0,-278842379.0,-3863540.0,-77803657.0,56945810.0,2214309.0,,2209112.0

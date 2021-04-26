@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+TBRG,2018-09-30,False,Q3,2018,10-Q,,-171030.0,1073108.0,-0.01,-0.01,0.0,262733379.0,873191.0,15006.0,767718.0,5000010.0,-406509.0,-260580000.0,261728410.0,1500000.0,,

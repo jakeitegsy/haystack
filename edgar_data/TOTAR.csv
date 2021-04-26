@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+TOTAU,2018-09-30,False,Q3,2018,10-Q,,,-72950.0,-0.05,-0.05,0.0,46946885.0,822746.0,57240.0,756042.0,4584575.0,-193113.0,-46000000.0,46949155.0,,,
+TOTAU,2018-06-30,False,Q2,2018,10-Q,,,-15625.0,-0.01,-0.01,0.0,215733.0,,,44369.0,-31217.0,-51779.0,,96148.0,,,
+TOTAU,2018-06-30,False,Q2,2018,10-Q,,,-15625.0,-0.01,-0.01,0.0,215733.0,,,44369.0,-31217.0,-51779.0,,96148.0,,,

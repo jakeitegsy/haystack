@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+PLAN,2018-10-31,False,Q3,2018,10-Q,381100000.0,-37056000.0,-37961000.0,-0.82,-0.82,0.0,532752000.0,458621000.0,168688000.0,374197000.0,351889000.0,-29915000.0,-18909000.0,308227000.0,,,13545000.0

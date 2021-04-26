@@ -1,0 +1,2 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+BSVN,2018-09-30,False,Q3,2018,10-Q,12058000.0,,6710000.0,0.88,0.87,0.0,751173000.0,,,127248000.0,82765000.0,20122000.0,-19946000.0,27018000.0,0.0,2046000.0,0.0

@@ -1,0 +1,3 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+PFSI,2018-12-31,False,FY,2018,10-K,984629000.0,,87694000.0,2.62,2.59,0.4,7478573000.0,,,155289000.0,1653791000.0,572396000.0,-322611000.0,-132034000.0,1648973000.0,,13421000.0
+PFSI,2018-09-30,False,Q3,2018,10-Q,250929000.0,,14489000.0,0.58,0.57,0.4,6992530000.0,,,102627000.0,1916710000.0,732584000.0,-349783000.0,-317722000.0,1291847000.0,,8919000.0

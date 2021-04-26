@@ -1,0 +1,4 @@
+symbol,end_date,amend,period_focus,fiscal_year,doc_type,revenues,op_income,net_income,eps_basic,eps_diluted,dividend,assets,cur_assets,cur_liab,cash,equity,cash_flow_op,cash_flow_inv,cash_flow_fin,debt,goodwill,cap_ex
+ADIL,2018-09-30,False,Q3,2018,10-Q,,-3816099.0,-8190924.0,-1.48,-1.48,0.0,5252174.0,5245299.0,322806.0,4816705.0,4929368.0,-1394475.0,,6192932.0,,,
+ADIL,2018-06-30,False,Q2,2018,10-Q,,-1741467.0,-1792356.0,-0.5,-0.5,0.0,187087.0,180070.0,1480604.0,150026.0,-1293517.0,-403222.0,,535000.0,,,
+ADIL,2018-12-31,False,FY,2018,10-K,,-6987222.0,-11631378.0,-2.44,-2.44,0.0,4699285.0,4692550.0,257974.0,3869043.0,4441311.0,-2498387.0,,6349182.0,,,

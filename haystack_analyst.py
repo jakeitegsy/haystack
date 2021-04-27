@@ -2,12 +2,12 @@ import datetime
 import json
 import yfinance as yahoo_finance
 
+from scipy.stats import hmean
 from haystack_utilities import (
     ANALYSIS_FOLDER, INDUSTRY_FOLDER, PROCESSED_FOLDER, 
     SECTORS_FOLDER,  STOCKPUP_FOLDER,
     pd, list_filetype, os, test_folder, makedir
 )
-from scipy.stats import hmean
 
 
 class Analyst:

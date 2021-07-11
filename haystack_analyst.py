@@ -12,23 +12,31 @@ from haystack_utilities import (
 
 class Analyst:
 
-    def __init__(self, ticker=None, filename=None, to_folder=None,
-                 from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}", 
-                 discount_rate=0.0316, source="STOCKPUP"):
+    def __init__(self, 
+        ticker=None, 
+        filename=None, 
+        to_folder=None,
+        from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}", 
+        discount_rate=0.0316, 
+        source="STOCKPUP"
+    ):
         self.ticker, self.filename = self.get_ticker_and_filename(
             filename=filename,
             ticker=ticker,
             folder=from_folder,
         )
-        self.rate = discount_rate
+        self.discount_rate = discount_rate
         self.source = source
+
+    def fourth_quarter(self):
+        return lambda x: x[0]
 
     def aggregate(self, df):
         """returns dataframe with yearly summary for each column"""
         Q4 = lambda x: x[0]
         try: 
-            df = df.groupby(level=0).agg({
-                "CURRENT_ASSETS": Q4,
+            return df.groupby(level=0).agg({
+                "CURRENT_ASSETS": self.fourth_quarter(), # Q4,
                 "CURRENT_LIABILITIES": Q4,
                 "NET_ASSETS": Q4,
                 "NET_CASH": Q4,
@@ -56,8 +64,6 @@ class Analyst:
             write_error(self.filename, error_msg)
         except KeyError:
             pass
-
-        return df
 
     def calc_diffs(self, data):
         assets = data["NET_ASSETS"]
@@ -97,9 +103,9 @@ class Analyst:
 
         return self.transform_dict(diffs_dict)
 
-    def calc_dcf(self, values):
-        return sum([(values[i] / ((1 + self.rate) ** i)) 
-                    for i in range(len(values))])            
+    def get_discount_cash_flow_value(self, values):
+        return sum([(values[i] / ((1 + self.discount_rate) ** i)) 
+                    for i in range(len(values))])
 
     def calc_growth(self, df, using="simple"):
         "Return Simple or Compound Growth Rate"
@@ -192,12 +198,12 @@ class Analyst:
         per_share["PER_SHARE_DCF_HISTORIC"] = (
             per_share["PER_SHARE_NET_FCF"]
             .expanding(min_periods=1)
-            .apply(self.calc_dcf, raw=True)
+            .apply(self.get_discount_cash_flow_value, raw=True)
         )
         per_share["PER_SHARE_DCF_SHY_HISTORIC"] = (
             per_share["PER_SHARE_NET_FCF_SHY"]
             .expanding(min_periods=1)
-            .apply(self.calc_dcf, raw=True)
+            .apply(self.get_discount_cash_flow_value, raw=True)
         )
 
         return per_share
@@ -417,10 +423,10 @@ class Analyst:
             ticker = os.path.split(filename)[1].split(".")[0]
             filename = filename
             folder = os.path.dirname(filename)
-        elif folder is not None:
+        if folder is not None:
             ticker = ticker
             filename = f"{folder}{ticker}.csv"
-        return (ticker, filename)                         
+        return (ticker, filename)
 
     def judge_growth(self, rate):
         try:

@@ -266,35 +266,32 @@ class TestEdgar(unittest.TestCase):
             analyst.calculate_moving_averages(raw_data).columns
         )
 
-    def test_calculate_moving_averages_per_share(self):
+    def test_calculate_average_per_share_averages(self):
         assert_index_equal(
-            analyst.calculate_moving_averages_per_share(raw_data).columns,
+            analyst.calculate_average_per_share_averages(raw_data).index,
+            analyst.calculate_moving_averages_per_share(raw_data).columns
+        )
+
+    def test_average_per_share_differences(self):
+        assert_index_equal(
+            analyst.calculate_average_per_share_differences(raw_data).index,
             Index([
-                'PER_SHARE_CURRENT_ASSETS',
-                'PER_SHARE_CURRENT_LIABILITIES',
-                'PER_SHARE_NET_ASSETS',
-                'PER_SHARE_NET_CASH',
-                'PER_SHARE_NET_CASH_FIN',
-                'PER_SHARE_NET_CASH_INVESTED',
-                'PER_SHARE_NET_CASH_OP',
-                'PER_SHARE_NET_DEBT',
-                'PER_SHARE_NET_DIVIDENDS',
-                'PER_SHARE_NET_EQUITY',
-                'PER_SHARE_NET_EXPENSES',
-                'PER_SHARE_NET_FCF',
-                'PER_SHARE_NET_FCF_SHY',
-                'PER_SHARE_NET_GOODWILL',
-                'PER_SHARE_NET_INCOME',
-                'PER_SHARE_NET_INVESTED_CAPITAL',
-                'PER_SHARE_NET_LIABILITIES',
-                'PER_SHARE_NET_NONCONTROLLING',
-                'PER_SHARE_NET_RETAINED',
-                'PER_SHARE_NET_REVENUE',
-                'PER_SHARE_NET_SHARES',
-                'PER_SHARE_NET_TANGIBLE',
-                'PER_SHARE_NET_WORKING_CAPITAL',
-                'PER_SHARE_DCF_HISTORIC',
-                'PER_SHARE_DCF_SHY_HISTORIC'
+                'PER_SHARE_DIFF_ASSETS_DEBT',
+                'PER_SHARE_DIFF_ASSETS_LIABILITIES',
+                'PER_SHARE_DIFF_CASH_DEBT',
+                'PER_SHARE_DIFF_CASH_LIABILITIES',
+                'PER_SHARE_DIFF_CURRENT_ASSETS_DEBT',
+                'PER_SHARE_DIFF_CURRENT_ASSETS_LIABILITIES',
+                'PER_SHARE_DIFF_EQUITY_DEBT',
+                'PER_SHARE_DIFF_EQUITY_LIABILITIES',
+                'PER_SHARE_DIFF_FCF_DEBT',
+                'PER_SHARE_DIFF_FCF_LIABILITIES',
+                'PER_SHARE_DIFF_FCF_SHY_DEBT',
+                'PER_SHARE_DIFF_FCF_SHY_LIABILITIES',
+                'PER_SHARE_DIFF_INCOME_DEBT',
+                'PER_SHARE_DIFF_INCOME_LIABILITIES',
+                'PER_SHARE_DIFF_TANGIBLE_DEBT',
+                'PER_SHARE_DIFF_TANGIBLE_LIABILITIES'
             ])
         )
 
@@ -318,7 +315,7 @@ class TestEdgar(unittest.TestCase):
 
     def test_average_per_share_differences(self):
         assert_index_equal(
-            analyst.calculate_average_per_share_differences(raw_data).columns,
+            analyst.calculate_average_per_share_differences(raw_data).index,
             Index([
                 'PER_SHARE_DIFF_ASSETS_DEBT',
                 'PER_SHARE_DIFF_ASSETS_LIABILITIES',
@@ -426,7 +423,7 @@ class TestEdgar(unittest.TestCase):
                 analyst.calculate_average_moving_average_differences(raw_data),
                 analyst.calculate_moving_average_growth_rates(raw_data),
                 analyst.calculate_average_moving_averages(raw_data),
-                analyst.calculate_moving_averages_per_share(raw_data),
+                analyst.calculate_average_per_share_averages(raw_data),
                 analyst.calculate_average_per_share_differences(raw_data),
                 analyst.calculate_average_moving_average_ratios(raw_data),
             ], axis=0).index

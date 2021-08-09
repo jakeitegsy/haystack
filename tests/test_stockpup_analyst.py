@@ -435,6 +435,12 @@ class TestStockPup(unittest.TestCase):
 			])
 		)
 
+	def test_calculate_average_per_share_averages(self):
+		assert_index_equal(
+			analyst.calculate_average_per_share_averages(raw_data).index,
+			analyst.calculate_moving_averages_per_share(raw_data).columns
+		)
+
 	def test_calculate_average_moving_averages(self):
 		assert_index_equal(
 			analyst.calculate_average_moving_averages(raw_data).index,
@@ -455,7 +461,7 @@ class TestStockPup(unittest.TestCase):
 
 	def test_average_per_share_differences(self):
 		assert_index_equal(
-			analyst.calculate_average_per_share_differences(raw_data).columns,
+			analyst.calculate_average_per_share_differences(raw_data).index,
 			Index([
 				'PER_SHARE_DIFF_ASSETS_DEBT',
 				'PER_SHARE_DIFF_ASSETS_LIABILITIES',
@@ -563,7 +569,7 @@ class TestStockPup(unittest.TestCase):
 				analyst.calculate_average_moving_average_differences(raw_data),
 				analyst.calculate_moving_average_growth_rates(raw_data),
 				analyst.calculate_average_moving_averages(raw_data),
-				analyst.calculate_moving_averages_per_share(raw_data),
+				analyst.calculate_average_per_share_averages(raw_data),
 				analyst.calculate_average_per_share_differences(raw_data),
 				analyst.calculate_average_moving_average_ratios(raw_data),
 			], axis=0).index

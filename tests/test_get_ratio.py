@@ -11,7 +11,6 @@ pdt = pd.testing
 class TestGetRatio(unittest.TestCase):
 
     def make_series(self, elements):
-        of_length = self.length
         return pd.Series(elements,
                          index=range(len(elements)),
                          dtype=numpy.float64)
@@ -32,9 +31,15 @@ class TestGetRatio(unittest.TestCase):
         self.negative = -1
 
     def test_get_ratio_returns_negative_number_when_numerator_is_zero(self):
-        self.assertEqual(self.get_ratio(self.zero, self.positive), self.negative)
-        self.assertEqual(self.get_ratio(self.zero, self.zero), self.zero)
-        self.assertEqual(self.get_ratio(self.zero, self.negative), self.negative)
+        self.assertEqual(
+            self.get_ratio(self.zero, self.positive), self.negative
+        )
+        self.assertEqual(
+            self.get_ratio(self.zero, self.zero), self.zero
+        )
+        self.assertEqual(
+            self.get_ratio(self.zero, self.negative), self.negative
+        )
 
     def test_get_ratio_returns_negative_ratio_when_denominator_is_less_than_zero(self):
         self.assertEqual(self.get_ratio(self.positive, -2), -0.5)
@@ -48,15 +53,20 @@ class TestGetRatio(unittest.TestCase):
         self.assertEqual(self.get_ratio(self.negative, 2), -0.5)
 
     def test_get_ratio_returns_negative_numerator_when_numerator_is_less_than_zero_and_y_is_zero(self):
-        self.assertEqual(self.get_ratio(self.negative, self.zero), self.negative)
+        self.assertEqual(
+            self.get_ratio(self.negative, self.zero), self.negative
+        )
 
     def test_get_ratio_returns_numerator_when_denominator_is_zero(self):
-        self.assertEqual(self.get_ratio(self.positive, self.zero), self.positive)
+        self.assertEqual(
+            self.get_ratio(self.positive, self.zero), self.positive
+        )
         self.assertEqual(self.get_ratio(2, self.zero), 2)
 
     def test_get_ratio_returns_ratio_when_both_numerator_and_denominator_are_positive(self):
         self.assertEqual(
-            self.get_ratio(self.positive, self.positive), self.positive
+            self.get_ratio(self.positive, self.positive), 
+            self.positive
         )
         self.assertEqual(self.get_ratio(1, 2), 0.5)
         self.assertEqual(self.get_ratio(2, 1), 2.0)
@@ -77,17 +87,23 @@ class TestGetRatio(unittest.TestCase):
 
     def test_get_ratio_returns_negative_ratio_series_when_denominator_is_less_than_zero(self):
         pdt.assert_series_equal(
-            self.get_ratio(self.positive_series, self.negative_series),
+            self.get_ratio(
+                self.positive_series, self.negative_series
+            ),
             self.negative_identity_series
         )
         pdt.assert_series_equal(
-            self.get_ratio(self.negative_series, self.negative_series),
+            self.get_ratio(
+                self.negative_series, self.negative_series
+            ),
             self.negative_identity_series
         )
 
     def test_get_ratio_returns_negative_ratio_series_when_numerator_is_less_than_zero_and_y_is_greater_than_zero(self):
         pdt.assert_series_equal(
-            self.get_ratio(self.negative_series, self.positive_series), 
+            self.get_ratio(
+                self.negative_series, self.positive_series
+            ), 
             self.negative_identity_series
         )
         pdt.assert_series_equal(
@@ -98,9 +114,8 @@ class TestGetRatio(unittest.TestCase):
         )
 
     def test_get_ratio_returns_negative_series_when_numerator_is_less_than_zero_and_y_is_zero(self):
-        pdt.assert_series_equal(self.get_ratio(
-            self.negative_series, self.zero_series
-            ),
+        pdt.assert_series_equal(
+            self.get_ratio(self.negative_series, self.zero_series),
             self.negative_series
         )
 
@@ -112,12 +127,16 @@ class TestGetRatio(unittest.TestCase):
 
     def test_get_ratio_returns_ratio_series_when_both_numerator_and_denominator_are_positive(self):
         pdt.assert_series_equal(
-            self.get_ratio(self.positive_series, self.positive_series),     
+            self.get_ratio(
+                self.positive_series, self.positive_series
+            ),     
             -(self.negative_identity_series)
         )
-        pdt.assert_series_equal(self.get_ratio(
+        pdt.assert_series_equal(
+            self.get_ratio(
                 self.positive_series, self.positive_two_series
-            ), -(self.negative_ratio_series)
+            ), 
+            -(self.negative_ratio_series)
         )
 
 

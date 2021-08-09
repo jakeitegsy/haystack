@@ -137,12 +137,6 @@ class Analyst:
         self.log('Converted 1999-12-31 to 2000-01-01')
         return dataframe.replace('2000-01-01', '1999-12-31')
 
-    def add_prefix(self, dataframe, prefix=None):
-        if prefix:
-            return dataframe.add_prefix(prefix)
-        else:
-            return dataframe
-
     def set_uppercase_column_names(self, dataframe):
         self.log('Setting Column Names to UPPERCASE Labels')
         return dataframe.rename(str.upper, axis='columns')
@@ -226,6 +220,8 @@ class Analyst:
             )
         )
 
+    
+
     def calculate_average_moving_average_ratios(self, dataframe):
         return Series(
             self.calculate_ratios(
@@ -233,11 +229,14 @@ class Analyst:
             )
         )
 
+    def calculate_average_net_shares(self, dataframe):
+        return self.calculate_average_moving_averages(dataframe)['NET_SHARES']
+
     def calculate_average_per_share_differences(self, dataframe):
-        return (
-            self.calculate_moving_average_differences(dataframe)
-                .div(self.calculate_average_moving_averages(dataframe)['NET_SHARES']
-            ).add_prefix('PER_SHARE_')
+        self.log('Calculating Average Differences Per Share')
+        return self.add_prefix(
+            self.calculate_average_moving_average_differences(dataframe)
+                .div(self.calculate_average_net_shares(dataframe))
         )
 
     def calculate_average_per_share_averages(self, dataframe):
@@ -316,11 +315,14 @@ class Analyst:
         return dataframe.pct_change(axis=0)
 
     def calculate_moving_average_growth_rates(self, dataframe):
-        return self.replace_null_values_with_zero(
-            self.calculate_compound_growth_rate(
-                self.calculate_moving_averages(dataframe)
-            )
-        ).add_prefix('GROWTH_')
+        return self.add_prefix(
+            self.replace_null_values_with_zero(
+                self.calculate_compound_growth_rate(
+                    self.calculate_moving_averages(dataframe)
+                )
+            ),
+            prefix='GROWTH_',
+        )
 
     def get_discount_cash_flow_value(self, values):
         return sum([(values[i] / ((1 + self.discount_rate) ** i)) 
@@ -347,12 +349,19 @@ class Analyst:
     def calculate_dcf_valuation(self, dataframe=None, key=None):
         return (
             dataframe[key].expanding(min_periods=1)
-                          .apply(self.get_discount_cash_flow_value, raw=True)
+                          .apply(
+                            self.get_discount_cash_flow_value, raw=True
+                           )
         )
+
+    def add_prefix(self, dataframe, prefix='PER_SHARE_'):
+        return dataframe.add_prefix(prefix)
 
     def calculate_moving_averages_per_share(self, dataframe):
         moving_averages = self.calculate_moving_averages(dataframe)
-        result = moving_averages.div(moving_averages['NET_SHARES'], axis=0).add_prefix('PER_SHARE_')
+        result = self.add_prefix(
+            moving_averages.div(moving_averages['NET_SHARES'], axis=0)
+        )
         result['PER_SHARE_DCF_HISTORIC'] = self.calculate_dcf_valuation(dataframe=result, key='PER_SHARE_NET_FCF')
         result['PER_SHARE_DCF_SHY_HISTORIC'] = self.calculate_dcf_valuation(dataframe=result, key='PER_SHARE_NET_FCF_SHY')
         return result
@@ -422,7 +431,7 @@ class Analyst:
             self.calculate_average_moving_average_differences(dataframe),
             self.calculate_moving_average_growth_rates(dataframe),
             self.calculate_average_moving_averages(dataframe),
-            self.calculate_moving_averages_per_share(dataframe),
+            self.calculate_average_per_share_averages(dataframe),
             self.calculate_average_per_share_differences(dataframe),
             self.calculate_average_moving_average_ratios(dataframe),
         ], axis=0)
@@ -577,69 +586,7 @@ class Analyst:
             if rate == 0: return 'idled'
             if rate < 0: return 'shrank'
         except TypeError:
-            return 'ignore'
-
-    def correct_columns(self, dataframe, prefix=None):
-        dataframe = self.uppercase_labels(dataframe)
-        edgar = {
-            "ASSETS": "NET_ASSETS",
-            "CASH": "NET_CASH",
-            "CASH_FLOW_FIN": "NET_CASH_FIN",
-            "CASH_FLOW_INV": "NET_CASH_INVESTED",
-            "CASH_FLOW_OP": "NET_CASH_OP",
-            "CUR_ASSETS": "CURRENT_ASSETS",
-            "CUR_LIAB": "CURRENT_LIABILITIES",
-            "DEBT": "NET_DEBT",
-            "DIVIDEND": "PER_SHARE_DIVIDENDS",
-            "EPS_BASIC": "PER_SHARE_EARNINGS_BASIC",
-            "EPS_DILUTED": "PER_SHARE_EARNINGS_DILUTED",
-            "GOODWILL": "NET_GOODWILL",
-            "INTANGIBLE": "NET_INTANGIBLE",
-            "REVENUES": "NET_REVENUE",
-            "EQUITY": "NET_EQUITY",
-        }
-        stockpup = {
-            "ASSETS": "NET_ASSETS",
-            "BOOK VALUE OF EQUITY PER SHARE": "PER_SHARE_BOOK",
-            "CASH AT END OF PERIOD": "NET_CASH", 
-            "CASH FROM FINANCING ACTIVITIES": "NET_CASH_FIN",
-            "CASH FROM INVESTING ACTIVITIES": "NET_CASH_INVESTED",
-            "CASH FROM OPERATING ACTIVITIES": "NET_CASH_OP",
-            "CAPITAL EXPENDITURES": "CAPITAL_EXPENDITURES",
-            "CUMULATIVE DIVIDENDS PER SHARE": "PER_SHARE_CUM_DIVIDENDS",
-            "CURRENT ASSETS": "CURRENT_ASSETS",
-            "CURRENT LIABILITIES": "CURRENT_LIABILITIES",
-            "DIVIDEND PAYOUT RATIO": "RATIO_DIVIDENDS",
-            "DIVIDEND PER SHARE": "PER_SHARE_DIVIDENDS",
-            "EARNINGS AVAILABLE FOR COMMON STOCKHOLDERS":"NET_INCOME",
-            "EPS BASIC": "PER_SHARE_EARNINGS_BASIC",
-            "EPS DILUTED": "PER_SHARE_EARNINGS_DILUTED",
-            "GOODWILL & INTANGIBLES": "NET_GOODWILL", 
-            "LIABILITIES": "NET_LIABILITIES",
-            "LONG-TERM DEBT": "NET_DEBT", 
-            "NON-CONTROLLING INTEREST": "NET_NONCONTROLLING",
-            "PREFERRED EQUITY": "NET_PREFERRED",
-            "REVENUE": "NET_REVENUE",
-            "SHAREHOLDERS EQUITY": "NET_EQUITY", 
-            "SHARES": "NET_SHARES_NO_SPLIT",
-            "SHARES SPLIT ADJUSTED": "NET_SHARES",
-        }
-
-        source = self.source.upper()
-        if source == "STOCKPUP": source_columns = stockpup
-        if source == "EDGAR": source_columns = edgar
-
-        if prefix is not None:
-            dataframe = dataframe.add_prefix(prefix)
-        else:
-            try:
-                dataframe.rename(columns=source_columns)
-            except AttributeError:
-                return
-
-        return dataframe[~dataframe.index.duplicated()]
-
-    
+            return 'ignore'    
 
     def relative_scaler(self, series):
         return (series / (series.max() - series.min()))

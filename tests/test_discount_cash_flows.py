@@ -1,5 +1,5 @@
 import unittest
-from haystack_analyst import Analyst
+from analyst import Analyst
 from numpy import nan
 from numpy.testing import assert_equal
 

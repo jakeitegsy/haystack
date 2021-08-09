@@ -132,7 +132,7 @@ def test_prep(from_folder=None, to_folder=None, using=None, **kwargs):
                     to_folder=to_folder,
                     using=using,
                     **kwargs,
-                )subl
+                )
 
             print(f"..................... Currently Testing {ticker} "
                   f"from {using.__name__} data .....................")

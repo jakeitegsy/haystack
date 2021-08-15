@@ -18,6 +18,38 @@ from haystack_utilities import (
     pd, list_filetype, os, test_folder, makedir
 )
 
+def get_ratio(numerator, denominator):
+    """returns ratio for positive numbers
+        returns diff for denominators less than or equal to zero
+    """
+    x = numerator
+    y = denominator
+
+    if type(x) == pd.Series and type(y) == pd.Series:
+        # returns -abs(y) when x is 0
+        ratio1 = -abs(y[x == 0])
+        # returns -abs(x/y) when y is negative
+        ratio2 = -abs(x[(x != 0) & (y < 0)]  / y[(x != 0) & (y < 0)])
+        ratio3 = -abs(x[(x < 0) & (y > 0)] / y[(x < 0) & (y > 0)])
+        # Defines Zero Division
+        ratio4 = -abs(x[(x < 0) & (y == 0)])
+        ratio5 = x[(x > 0) & (y == 0)]
+        # regular ratio
+        ratio6 = x[(x > 0) & (y > 0)] / y[(x > 0) & (y > 0)]
+        return pd.concat([ratio1, ratio2, ratio3,
+                            ratio4, ratio5, ratio6],
+                            axis=0)
+    else:
+        # returns -abs(y) when x is 0
+        if x == 0: return -abs(y)
+        # returns -abs(x/y) when y is negative
+        if x != 0 and y < 0: return -abs(x / y)
+        if x < 0 and y > 0: return -abs(x / y)
+        # Defines Zero Division
+        if x < 0 and y == 0: return -abs(x)
+        if x > 0 and y == 0: return x
+        # regular ratio
+        if x > 0 and y > 0: return x / y
 
 class Analyst:
 
@@ -86,7 +118,9 @@ class Analyst:
 
     def get_net_tangible(self, dataframe):
         return (
-            dataframe['NET_ASSETS'] - self.get_net_liabilities(dataframe) + dataframe['NET_GOODWILL']
+            dataframe['NET_ASSETS'] 
+          - self.get_net_liabilities(dataframe) 
+          + dataframe['NET_GOODWILL']
         )
 
     def calculate_net_values(self, dataframe):
@@ -219,8 +253,6 @@ class Analyst:
                 self.calculate_average_moving_averages(dataframe)
             )
         )
-
-    
 
     def calculate_average_moving_average_ratios(self, dataframe):
         return Series(
@@ -369,45 +401,45 @@ class Analyst:
     def calculate_ratios(self, data):
         return {
             "RATIO_CASH_ASSETS": data['NET_CASH'] / data['NET_ASSETS'],
-            "RATIO_CASH_DEBT": self.get_ratio(data['NET_CASH'], data['NET_DEBT']),
+            "RATIO_CASH_DEBT": get_ratio(data['NET_CASH'], data['NET_DEBT']),
             "RATIO_CASH_LIABILITIES": data['NET_CASH'] / data['NET_LIABILITIES'],
-            "RATIO_CASH_TANGIBLE": self.get_ratio(data['NET_CASH'], data['NET_TANGIBLE']),
-            "RATIO_CURRENT": self.get_ratio(
+            "RATIO_CASH_TANGIBLE": get_ratio(data['NET_CASH'], data['NET_TANGIBLE']),
+            "RATIO_CURRENT": get_ratio(
                 data['CURRENT_ASSETS'], data["CURRENT_LIABILITIES"]
             ),
-            "RATIO_CURRENT_ASSETS_LIABILITIES": self.get_ratio(
+            "RATIO_CURRENT_ASSETS_LIABILITIES": get_ratio(
                 data['CURRENT_ASSETS'], data['NET_LIABILITIES']
             ),
-            "RATIO_CURRENT_DEBT": self.get_ratio(data['CURRENT_ASSETS'], data['NET_DEBT']),
+            "RATIO_CURRENT_DEBT": get_ratio(data['CURRENT_ASSETS'], data['NET_DEBT']),
             "RATIO_EQUITY_ASSETS": data['NET_EQUITY'] / data['NET_ASSETS'],
-            "RATIO_EQUITY_DEBT": self.get_ratio(data['NET_EQUITY'], data['NET_DEBT']),
+            "RATIO_EQUITY_DEBT": get_ratio(data['NET_EQUITY'], data['NET_DEBT']),
             "RATIO_EQUITY_LIABILITIES": data['NET_EQUITY'] / data['NET_LIABILITIES'],
-            "RATIO_EQUITY_TANGIBLE": self.get_ratio(data['NET_EQUITY'], data['NET_TANGIBLE']),
-            "RATIO_EXPENSES_REVENUE": self.get_ratio(data['NET_EXPENSES'], data['NET_REVENUE']),
+            "RATIO_EQUITY_TANGIBLE": get_ratio(data['NET_EQUITY'], data['NET_TANGIBLE']),
+            "RATIO_EXPENSES_REVENUE": get_ratio(data['NET_EXPENSES'], data['NET_REVENUE']),
             "RATIO_FCF_ASSETS": data['NET_FCF'] / data['NET_ASSETS'],
-            "RATIO_FCF_DEBT": self.get_ratio(data['NET_FCF'], data['NET_DEBT']),
-            "RATIO_FCF_EQUITY": self.get_ratio(data['NET_FCF'], data['NET_EQUITY']),
+            "RATIO_FCF_DEBT": get_ratio(data['NET_FCF'], data['NET_DEBT']),
+            "RATIO_FCF_EQUITY": get_ratio(data['NET_FCF'], data['NET_EQUITY']),
             "RATIO_FCF_EXPENSES": data['NET_FCF'] / data['NET_EXPENSES'],
             "RATIO_FCF_INVESTED_CAPITAL": data['NET_FCF'] / data['NET_INVESTED_CAPITAL'],
             "RATIO_FCF_LIABILITIES": data['NET_FCF'] / data['NET_LIABILITIES'],
-            "RATIO_FCF_TANGIBLE": self.get_ratio(data['NET_FCF'], data['NET_TANGIBLE']),
+            "RATIO_FCF_TANGIBLE": get_ratio(data['NET_FCF'], data['NET_TANGIBLE']),
             "RATIO_FCF_SHY_ASSETS": data['NET_FCF_SHY'] / data['NET_ASSETS'],
-            "RATIO_FCF_SHY_DEBT": self.get_ratio(data['NET_FCF_SHY'], data['NET_DEBT']),
-            "RATIO_FCF_SHY_EQUITY": self.get_ratio(data['NET_FCF_SHY'], data['NET_EQUITY']),
+            "RATIO_FCF_SHY_DEBT": get_ratio(data['NET_FCF_SHY'], data['NET_DEBT']),
+            "RATIO_FCF_SHY_EQUITY": get_ratio(data['NET_FCF_SHY'], data['NET_EQUITY']),
             "RATIO_FCF_SHY_EXPENSES": data['NET_FCF_SHY'] / data['NET_EXPENSES'],
             "RATIO_FCF_SHY_INVESTED_CAPITAL": data['NET_FCF_SHY'] / data['NET_INVESTED_CAPITAL'],
             "RATIO_FCF_SHY_LIABILITIES": data['NET_FCF_SHY'] / data['NET_LIABILITIES'],
-            "RATIO_FCF_SHY_TANGIBLE": self.get_ratio(data['NET_FCF_SHY'], data['NET_TANGIBLE']),
+            "RATIO_FCF_SHY_TANGIBLE": get_ratio(data['NET_FCF_SHY'], data['NET_TANGIBLE']),
             "RATIO_INCOME_ASSETS": data['NET_INCOME'] / data['NET_ASSETS'],
-            "RATIO_INCOME_DEBT": self.get_ratio(data['NET_INCOME'], data['NET_DEBT']),
-            "RATIO_INCOME_EQUITY": self.get_ratio(data['NET_INCOME'], data['NET_EQUITY']),
+            "RATIO_INCOME_DEBT": get_ratio(data['NET_INCOME'], data['NET_DEBT']),
+            "RATIO_INCOME_EQUITY": get_ratio(data['NET_INCOME'], data['NET_EQUITY']),
             "RATIO_INCOME_EXPENSES": data['NET_INCOME'] / data['NET_EXPENSES'],
             "RATIO_INCOME_INVESTED_CAPITAL": data['NET_INCOME'] / data['NET_INVESTED_CAPITAL'],
             "RATIO_INCOME_LIABILITIES": data['NET_INCOME'] / data['NET_LIABILITIES'],
-            "RATIO_INCOME_TANGIBLE": self.get_ratio(data['NET_INCOME'], data['NET_TANGIBLE']),
+            "RATIO_INCOME_TANGIBLE": get_ratio(data['NET_INCOME'], data['NET_TANGIBLE']),
             "RATIO_TANGIBLE_ASSETS": data['NET_TANGIBLE'] / data['NET_ASSETS'],
             "RATIO_TANGIBLE_LIABILITIES": data['NET_TANGIBLE'] / data['NET_LIABILITIES'],
-            "RATIO_TANGIBLE_DEBT": self.get_ratio(data['NET_TANGIBLE'], data['NET_DEBT']),        
+            "RATIO_TANGIBLE_DEBT": get_ratio(data['NET_TANGIBLE'], data['NET_DEBT']),        
         }
 
     def calculate_moving_average_ratios(self, dataframe):
@@ -535,39 +567,6 @@ class Analyst:
             return pd.read_pickle(last_known_prices)
 
         return current_prices
-
-    def get_ratio(self, numerator, denominator):
-        """returns ratio for positive numbers
-           returns diff for denominators less than or equal to zero
-        """
-        x = numerator
-        y = denominator
-
-        if type(x) == pd.Series and type(y) == pd.Series:
-            # returns -abs(y) when x is 0
-            ratio1 = -abs(y[x == 0])
-            # returns -abs(x/y) when y is negative
-            ratio2 = -abs(x[(x != 0) & (y < 0)]  / y[(x != 0) & (y < 0)])
-            ratio3 = -abs(x[(x < 0) & (y > 0)] / y[(x < 0) & (y > 0)])
-            # Defines Zero Division
-            ratio4 = -abs(x[(x < 0) & (y == 0)])
-            ratio5 = x[(x > 0) & (y == 0)]
-            # regular ratio
-            ratio6 = x[(x > 0) & (y > 0)] / y[(x > 0) & (y > 0)]
-            return pd.concat([ratio1, ratio2, ratio3,
-                              ratio4, ratio5, ratio6],
-                              axis=0)
-        else:
-            # returns -abs(y) when x is 0
-            if x == 0: return -abs(y)
-            # returns -abs(x/y) when y is negative
-            if x != 0 and y < 0: return -abs(x / y)
-            if x < 0 and y > 0: return -abs(x / y)
-            # Defines Zero Division
-            if x < 0 and y == 0: return -abs(x)
-            if x > 0 and y == 0: return x
-            # regular ratio
-            if x > 0 and y > 0: return x / y
 
     def get_ticker_and_filename(self, filename=None, ticker=None, 
                                 folder=None):

@@ -5,7 +5,7 @@ from haystack_utilities import (
     TEST_FOLDER, STOCKPUP_FOLDER, SECTORS_FOLDER
 )
 
-@unittest.skip
+
 class TestBenchmark(unittest.TestCase):
 
     def setUp(self):

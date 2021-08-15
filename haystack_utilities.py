@@ -52,34 +52,34 @@ def makedir(folder):
     except (OSError, TypeError):
         pass
 
-def munge_data(from_folder=None, to_folder=None, using=None, *args, **kwargs):
-    '''Writes file to to_folder after performing function from using on file from_folder
+def munge_data(from_folder=None, output_folder=None, munger=None, *args, **kwargs):
+    '''Processes file to output_folder after data processing from_folder
     '''
     directory = list_filetype(in_folder=from_folder)
     successful = 0
     failed = []
 
-    if directory is not None:
-        for filename in directory:
+    try:
+        for filename in list_filetype(in_folder=from_folder):
             in_file = f'{from_folder}{filename}'
             try:
-                using(filename=in_file, to_folder=to_folder, *args, **kwargs)
+                munger(filename=in_file, to_folder=output_folder, *args, **kwargs)
                 successful += 1
-            except Exception as error_msg:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                write_error(filename, error_msg, exc_type, exc_value, 
-                                                 exc_traceback)
+            except Exception as error:
+                write_error(filename, error, sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]),
                 failed.append(filename)
             else:
                 pass
-
+    except TypeError:
+        raise ValueError('directory must be provided')
+    
     if successful > 0:
-        print(f'... Successfully munged {successful} files to {to_folder}...')
+        print(f'... Successfully munged {successful} files to {output_folder}...')
 
     failed_count = len(failed)
     if failed_count > 0:
         print(f'{failed_count} reports failed')
-        [print(f'.... I could not munge {name} to {to_folder} ....')
+        [print(f'.... I could not munge {name} to {output_folder} ....')
                for name in failed]
 
 def random_file(from_folder=None):

@@ -1,8 +1,6 @@
 import unittest
 
 from analyst import Analyst
-from pandas.testing import assert_index_equal
-
 
 class TestAnalyst(unittest.TestCase):
 	
@@ -13,8 +11,9 @@ class TestAnalyst(unittest.TestCase):
 		self.assertEqual(Analyst().discount_rate, 0.0316)
 
 	def test_ticker_symbol_when_ticker_provided(self):
-		ticker = 'AAPL'
-		self.assertEqual(ticker, Analyst(ticker=ticker).ticker)
+		def ticker():
+			return 'AAPL'
+		self.assertEqual(ticker(), Analyst(ticker=ticker()).ticker)
 	
 	def test_none_has_no_length(self):
 		with self.assertRaises(TypeError):

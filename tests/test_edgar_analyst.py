@@ -15,21 +15,23 @@ class TestEdgar(unittest.TestCase):
 
     def test_source_folder_for_edgar_data(self):
         self.assertEqual(
-            Analyst(source='edgar').get_stock().source_folder(), 
+            Analyst(
+                source='edgar'
+            ).get_stock().source_folder(), 
             'edgar_data'
         )
 
     def test_edgar_filename_when_ticker_provided(self):
-        ticker = 'GOOG'
         self.assertEqual(
-            Analyst(ticker=ticker, source='EDGAR').get_stock().filename, 
+            Analyst(
+                ticker='GOOG', source='EDGAR'
+            ).get_stock().filename, 
             'GOOG.csv'
         )
 
     def test_ticker_when_filename_is_given(self):
-        filename = 'GOOG.csv'
         self.assertEqual(
-            Analyst(source='EDGAR', filename=filename).get_stock().ticker, 
+            Analyst(source='EDGAR', filename='GOOG.csv').get_stock().ticker, 
             'GOOG'
         )
 

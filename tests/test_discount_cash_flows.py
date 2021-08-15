@@ -1,5 +1,5 @@
 import unittest
-from analyst import Stock
+from stock import Stock
 from numpy import nan
 from numpy.testing import assert_equal
 

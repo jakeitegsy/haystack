@@ -2,7 +2,7 @@ import unittest
 import pandas
 import numpy
 
-from analyst import get_ratio
+from stock import get_ratio
 from haystack_utilities import os, TEST_FOLDER
 
 def create_series(elements):

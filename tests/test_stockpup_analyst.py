@@ -1,5 +1,5 @@
 import unittest
-import os
+import re
 
 from analyst import Analyst
 from numpy import median
@@ -20,20 +20,18 @@ class TestStockPup(unittest.TestCase):
 		)
 
 	def test_stockpup_filename_when_ticker_provided(self):
-		print()
-		ticker = 'BAC'
 		self.assertEqual(
-			Analyst(ticker=ticker).get_stock().filename, 
+			Analyst(ticker='BAC').get_stock().filename, 
 			'BAC_quarterly_financial_data.csv'
 		)
 
 	def test_ticker_when_filename_is_given(self):
-		filename = 'GOOG_quarterly_financial_data.csv'
 		self.assertEqual(
 			Analyst(
-				source='STOCKPUP', filename=filename
+				source='STOCKPUP', 
+				filename='GOOG_quarterly_financial_data.csv'
 			).get_stock().ticker, 
-			'GOOG'
+			re.search(r'(\w+)_quarterly', 'GOOG_quarterly_financial_data.csv')[1]
 		)
 
 	def test_raw_data_columns(self):

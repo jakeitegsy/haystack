@@ -3,15 +3,16 @@ import json
 import yfinance as yahoo_finance
 
 from datetime import datetime
+from itertools import product
 from re import search
-from pandas import (
-    DataFrame, Series, MultiIndex, Index, read_csv, to_numeric,
-    concat
-)
 from pandas.errors import EmptyDataError
 from pandas.api.types import is_object_dtype
 from numpy import inf, nan, median
 from scipy.stats import hmean
+from pandas import (
+    DataFrame, Series, MultiIndex, Index, read_csv, to_numeric,
+    concat
+)
 from haystack_utilities import (
     ANALYSIS_FOLDER, INDUSTRY_FOLDER, PROCESSED_FOLDER, 
     SECTORS_FOLDER,  STOCKPUP_FOLDER,
@@ -105,7 +106,7 @@ class Stock:
         return dataframe['NET_ASSETS'] - dataframe['NET_LIABILITIES']
 
     def get_net_dividends(self, dataframe):
-        return dataframe['PER_SHARE_DIVIDENDS'] * self.get_net_shares(dataframe)
+        return dataframe['PER_SHARE_DIVIDENDS'] * dataframe['NET_SHARES']
 
     def get_net_retained(self, dataframe):
         return dataframe['NET_INCOME'] * self.get_net_dividends(dataframe)
@@ -143,7 +144,7 @@ class Stock:
             "NET_NONCONTROLLING": self.get_net_noncontrolling(self.munged_data),
             "NET_RETAINED": self.get_net_retained(self.munged_data),
             "NET_REVENUE": self.munged_data["NET_REVENUE"],
-            "NET_SHARES": self.get_net_shares(self.munged_data),
+            "NET_SHARES": self.munged_data['NET_SHARES'],
             "NET_TANGIBLE": self.get_net_tangible(self.munged_data),
             "NET_WORKING_CAPITAL": self.munged_data["CURRENT_ASSETS"] - self.munged_data["CURRENT_LIABILITIES"],
         })
@@ -212,89 +213,124 @@ class Stock:
             self.get_differences(self.moving_averages)
         )
 
-    def get_average_moving_average_differences(self, dataframe):
+    def get_average_moving_average_differences(self):
         return Series(
             self.get_differences(
-                self.get_average_moving_averages(dataframe)
+                self.get_average_moving_averages()
             )
         )
 
-    def get_average_moving_average_ratios(self, dataframe):
+    def get_average_moving_average_ratios(self):
         return Series(
             self.get_ratios(
-                self.get_moving_average_sums(dataframe)
+                self.get_moving_average_sums()
             )
         )
 
     def get_average_net_shares(self, dataframe):
-        return self.get_average_moving_averages(dataframe)['NET_SHARES']
+        return self.get_average_moving_averages()['NET_SHARES']
 
-    def get_average_per_share_differences(self, dataframe):
+    def get_average_per_share_differences(self):
         self.log('Calculating Average Differences Per Share')
         return self.add_prefix(
-            self.get_average_moving_average_differences(dataframe)
-                .div(self.get_average_net_shares(dataframe))
+            self.get_average_moving_average_differences()
+                .div(self.get_average_net_shares(self.moving_averages))
         )
 
     def get_average_per_share_averages(self):
         self.log('Calculating Moving Averages Per Share')
         return self.get_moving_averages_per_share().iloc[-1]
 
-    def get_median_growth_rate(self, dataframe):
-        self.log('Calculating Median Growth Rates')
-        growth_rates = self.get_moving_average_growth_rates(dataframe)
-        return median([
-            growth_rates[f'GROWTH_NET_{value}'] for value in (
-                'ASSETS', 'CASH', 'CASH_INVESTED', 'EQUITY', 'FCF', 'FCF_SHY',
-                'INVESTED_CAPITAL', 'REVENUE', 'TANGIBLE'
-            )
-        ])
-
-    def get_median_returns(self, dataframe):
-        self.log('Calculating Median Returns')
-        ratios = self.get_moving_average_ratios(dataframe)
-        return median([
-            ratios[f'RATIO_{value}'] for value in (
-                'INCOME_ASSETS', 'INCOME_EQUITY', 'INCOME_EXPENSES', 
-                'INCOME_INVESTED_CAPITAL', 'INCOME_TANGIBLE',
-                'FCF_ASSETS', 'FCF_EQUITY', 'FCF_EXPENSES', 
-                'FCF_INVESTED_CAPITAL', 'FCF_TANGIBLE',
-                'FCF_SHY_ASSETS', 'FCF_SHY_EQUITY', 'FCF_SHY_EXPENSES',
-                'FCF_SHY_INVESTED_CAPITAL', 'FCF_SHY_TANGIBLE',
-            )
-        ])
-
-    def get_median_safety(self, dataframe):
-        self.log('Calculating Median Safety')
-        safety = self.get_average_moving_average_differences(dataframe)
-        safety_values = [
-            safety[f'DIFF_{value}'] for value in (
-                'ASSETS_DEBT', 'ASSETS_LIABILITIES', 
-                'CASH_DEBT', 'CASH_LIABILITIES',
-                'CURRENT_ASSETS_DEBT', 'CURRENT_ASSETS_LIABILITIES',
-                'EQUITY_DEBT', 'EQUITY_LIABILITIES',
-                'FCF_DEBT', 'FCF_LIABILITIES',
-                'FCF_SHY_DEBT', 'FCF_SHY_LIABILITIES',
-                'INCOME_DEBT', 'INCOME_LIABILITIES',
-                'TANGIBLE_DEBT', 'TANGIBLE_LIABILITIES'
-            )
-        ]
-        safety_values.append(
-            self.get_average_moving_averages(dataframe)['NET_WORKING_CAPITAL']
+    def financial_ratios(self):
+        return (
+            'ASSETS', 'CASH', 'CASH_INVESTED', 'EQUITY', 'FCF', 'FCF_SHY',
+            'INVESTED_CAPITAL', 'REVENUE', 'TANGIBLE'
         )
-        return median(safety_values)
 
-    def get_averages(self, dataframe):
+    def get_median_growth_rate(self):
+        self.log('Calculating Median Growth Rates')
+        return median([
+            self.get_moving_average_growth_rates()[f'GROWTH_NET_{value}'] 
+            for value in self.financial_ratios()
+        ])
+
+    def get_median_returns(self):
+        self.log('Calculating Median Returns')
+        moving_average_ratios = self.get_moving_average_ratios()
+        return median([
+            moving_average_ratios[f'RATIO_{value}'] 
+            for value in (
+                'INCOME_ASSETS',
+                'INCOME_CASH',
+                'INCOME_CASH_INVESTED',
+                'INCOME_EQUITY',
+                'INCOME_EXPENSES',
+                'INCOME_INVESTED_CAPITAL',
+                'INCOME_TANGIBLE',
+                'FCF_ASSETS',
+                'FCF_CASH',
+                'FCF_CASH_INVESTED',
+                'FCF_EQUITY',
+                'FCF_EXPENSES',
+                'FCF_INVESTED_CAPITAL',
+                'FCF_TANGIBLE',
+                'FCF_SHY_ASSETS',
+                'FCF_SHY_CASH',
+                'FCF_SHY_CASH_INVESTED',
+                'FCF_SHY_EQUITY',
+                'FCF_SHY_EXPENSES',
+                'FCF_SHY_INVESTED_CAPITAL',
+                'FCF_SHY_TANGIBLE'
+            )
+        ])
+
+    def obligations(self):
+        return ('DEBT', 'LIABILITIES')
+
+    def resources(self):
+        return (
+            'ASSETS', 
+            'CASH', 
+            'CURRENT_ASSETS', 
+            'EQUITY', 
+            'FCF', 
+            'FCF_SHY',
+            'INCOME', 
+            'TANGIBLE'
+        )
+
+    def safety_pairs(self):
+        return (
+            '_'.join(column) for column in product(
+                self.resources(),
+                self.obligations()
+            )
+        )
+
+    def get_median_safety(self):
+        self.log('Calculating Median Safety')
+        safety = self.get_average_moving_average_differences()
+        return median([
+            *(safety[f'DIFF_{value}'] for value in self.safety_pairs()),
+            self.get_average_moving_averages()['NET_WORKING_CAPITAL']
+        ])
+
+    def get_averages(self):
         self.log('Calculating Average Scores')
-        per_share_averages = self.get_average_per_share_averages(dataframe)
+        per_share_averages = self.get_average_per_share_averages()
         return Series({
-            'AVERAGE_GROWTH': self.get_median_growth_rate(dataframe),
-            'AVERAGE_RETURNS': self.get_median_returns(dataframe),
-            'AVERAGE_SAFETY': self.get_median_safety(dataframe),
+            'AVERAGE_GROWTH': self.get_median_growth_rate(),
+            'AVERAGE_RETURNS': self.get_median_returns(),
+            'AVERAGE_SAFETY': self.get_median_safety(),
             'DATA_END': self.moving_averages.index[0],
             'DATA_START': self.moving_averages.index[1],
-            'PER_SHARE_DCF_FORWARD': per_share_averages['PER_SHARE_NET_FCF'] / self.discount_rate,
-            'PER_SHARE_DCF_SHY_FORWARD': per_share_averages['PER_SHARE_NET_FCF_SHY'] / self.discount_rate
+            'PER_SHARE_DCF_FORWARD': (
+                per_share_averages['PER_SHARE_NET_FCF'] 
+              / self.discount_rate),
+            'PER_SHARE_DCF_SHY_FORWARD': (
+                per_share_averages['PER_SHARE_NET_FCF_SHY'] 
+              / self.discount_rate
+            )
         })
 
     def get_compound_growth_rate(self, dataframe):
@@ -386,6 +422,8 @@ class Stock:
             "RATIO_EQUITY_TANGIBLE": get_ratio(data['NET_EQUITY'], data['NET_TANGIBLE']),
             "RATIO_EXPENSES_REVENUE": get_ratio(data['NET_EXPENSES'], data['NET_REVENUE']),
             "RATIO_FCF_ASSETS": data['NET_FCF'] / data['NET_ASSETS'],
+            "RATIO_FCF_CASH": data['NET_FCF'] / data['NET_CASH'],
+            "RATIO_FCF_CASH_INVESTED": data['NET_FCF'] / data['NET_CASH_INVESTED'],
             "RATIO_FCF_DEBT": get_ratio(data['NET_FCF'], data['NET_DEBT']),
             "RATIO_FCF_EQUITY": get_ratio(data['NET_FCF'], data['NET_EQUITY']),
             "RATIO_FCF_EXPENSES": data['NET_FCF'] / data['NET_EXPENSES'],
@@ -393,6 +431,8 @@ class Stock:
             "RATIO_FCF_LIABILITIES": data['NET_FCF'] / data['NET_LIABILITIES'],
             "RATIO_FCF_TANGIBLE": get_ratio(data['NET_FCF'], data['NET_TANGIBLE']),
             "RATIO_FCF_SHY_ASSETS": data['NET_FCF_SHY'] / data['NET_ASSETS'],
+            "RATIO_FCF_SHY_CASH": data['NET_FCF_SHY'] / data['NET_CASH'],
+            "RATIO_FCF_SHY_CASH_INVESTED": data['NET_FCF_SHY'] / data['NET_CASH_INVESTED'],
             "RATIO_FCF_SHY_DEBT": get_ratio(data['NET_FCF_SHY'], data['NET_DEBT']),
             "RATIO_FCF_SHY_EQUITY": get_ratio(data['NET_FCF_SHY'], data['NET_EQUITY']),
             "RATIO_FCF_SHY_EXPENSES": data['NET_FCF_SHY'] / data['NET_EXPENSES'],
@@ -400,6 +440,8 @@ class Stock:
             "RATIO_FCF_SHY_LIABILITIES": data['NET_FCF_SHY'] / data['NET_LIABILITIES'],
             "RATIO_FCF_SHY_TANGIBLE": get_ratio(data['NET_FCF_SHY'], data['NET_TANGIBLE']),
             "RATIO_INCOME_ASSETS": data['NET_INCOME'] / data['NET_ASSETS'],
+            "RATIO_INCOME_CASH": data['NET_INCOME'] / data['NET_CASH'],
+            "RATIO_INCOME_CASH_INVESTED": data['NET_INCOME'] / data['NET_CASH_INVESTED'],
             "RATIO_INCOME_DEBT": get_ratio(data['NET_INCOME'], data['NET_DEBT']),
             "RATIO_INCOME_EQUITY": get_ratio(data['NET_INCOME'], data['NET_EQUITY']),
             "RATIO_INCOME_EXPENSES": data['NET_INCOME'] / data['NET_EXPENSES'],
@@ -414,29 +456,29 @@ class Stock:
     def get_moving_average_ratios(self):
         return DataFrame(self.get_ratios(self.moving_averages))
 
-    def get_moving_average_sums(self, dataframe):
+    def get_moving_average_sums(self):
         return self.moving_averages.apply(sum)
 
-    def get_average_moving_averages(self, dataframe):
+    def get_average_moving_averages(self):
         result = self.moving_averages.iloc[-1]
         result['NET_TANGIBLE'] = (
             result['NET_ASSETS'] - result['NET_LIABILITIES'] - result['NET_GOODWILL']
         )
         return result
 
-    def summarize(self, dataframe):
+    def summarize(self):
         return concat([
-            self.get_averages(dataframe),
-            self.get_average_moving_average_differences(dataframe),
-            self.get_moving_average_growth_rates(dataframe),
-            self.get_average_moving_averages(dataframe),
-            self.get_average_per_share_averages(dataframe),
-            self.get_average_per_share_differences(dataframe),
-            self.get_average_moving_average_ratios(dataframe),
+            self.get_averages(),
+            self.get_average_moving_average_differences(),
+            self.get_moving_average_growth_rates(),
+            self.get_average_moving_averages(),
+            self.get_average_per_share_averages(),
+            self.get_average_per_share_differences(),
+            self.get_average_moving_average_ratios(),
         ], axis=0)
         
-    def calc_price_ratios(self, dataframe):
-        ratios = {
+    def ratios(self):
+        return {
             "RATIO_CASH_PRICE" : "PER_SHARE_NET_CASH",
             "RATIO_DCF_HISTORIC_PRICE" : "PER_SHARE_DCF_HISTORIC",
             "RATIO_DCF_SHY_HISTORIC_PRICE" : "PER_SHARE_DCF_SHY_HISTORIC",
@@ -448,7 +490,9 @@ class Stock:
             "RATIO_INCOME_PRICE" : "PER_SHARE_NET_INCOME",
             "RATIO_TANGIBLE_PRICE" : "PER_SHARE_NET_TANGIBLE",
         }
-        for (ratio, numerator) in ratios.items():
+
+    def calc_price_ratios(self, dataframe):
+        for (ratio, numerator) in self.ratios().items():
             try:
                 dataframe[ratio] = dataframe[numerator] / dataframe["PER_SHARE_MARKET"]
             except ZeroDivisionError:
@@ -729,9 +773,6 @@ class StockPup(Stock):
              dataframe["NET_DEBT"] + dataframe["NET_PREFERRED"] + 
              self.get_net_noncontrolling(dataframe) + dataframe["NET_EQUITY"]
         )
-
-    def get_net_shares(self, dataframe):
-        return dataframe['NET_SHARES']
 
     def fourth_quarter(self, x):
         return x.iat[0]

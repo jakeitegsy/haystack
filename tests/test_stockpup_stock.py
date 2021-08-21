@@ -1,6 +1,7 @@
 import unittest
 import re
-
+import os
+os.system('') 
 from stock import Stock
 from numpy import median
 from pandas.testing import assert_index_equal
@@ -392,6 +393,8 @@ class TestStockPup(unittest.TestCase):
 					'EQUITY_TANGIBLE',
 					'EXPENSES_REVENUE',
 					'FCF_ASSETS',
+					'FCF_CASH',
+					'FCF_CASH_INVESTED',
 					'FCF_DEBT',
 					'FCF_EQUITY',
 					'FCF_EXPENSES',
@@ -399,6 +402,8 @@ class TestStockPup(unittest.TestCase):
 					'FCF_LIABILITIES',
 					'FCF_TANGIBLE',
 					'FCF_SHY_ASSETS',
+					'FCF_SHY_CASH',
+					'FCF_SHY_CASH_INVESTED',
 					'FCF_SHY_DEBT',
 					'FCF_SHY_EQUITY',
 					'FCF_SHY_EXPENSES',
@@ -406,6 +411,8 @@ class TestStockPup(unittest.TestCase):
 					'FCF_SHY_LIABILITIES',
 					'FCF_SHY_TANGIBLE',
 					'INCOME_ASSETS',
+					'INCOME_CASH',
+					'INCOME_CASH_INVESTED',
 					'INCOME_DEBT',
 					'INCOME_EQUITY',
 					'INCOME_EXPENSES',
@@ -461,66 +468,25 @@ class TestStockPup(unittest.TestCase):
 
 	def test_get_average_moving_averages(self):
 		assert_index_equal(
-			(
-				stock
-					.get_average_moving_averages(
-						stock.raw_data
-					)
-					.index
-			),
-			(
-				stock
-					.get_moving_averages(
-						stock.raw_data
-					)
-					.columns
-			)
+			stock.get_average_moving_averages().index,
+			stock.moving_averages.columns
 		)
-
-	"""
+	
 	def test_average_moving_average_differences(self):
 		assert_index_equal(
-			(
-				stock
-					.get_moving_average_differences(
-						stock.raw_data
-					)
-					.columns
-			),
-			(
-				stock
-					.get_average_moving_average_differences(stock.raw_data)
-					.index
-			)
+			stock.get_moving_average_differences().columns,
+			stock.get_average_moving_average_differences().index
 		)
 
 	def test_average_moving_average_ratios(self):
 		assert_index_equal(
-			(
-				stock
-					.get_average_moving_average_ratios(
-						stock.raw_data
-					)
-					.index
-			),
-			(
-				stock
-					.get_moving_average_ratios(
-						stock.raw_data
-					)
-				.columns
-			)
+			stock.get_average_moving_average_ratios().index,
+			stock.get_moving_average_ratios().columns
 		)
 
 	def test_average_per_share_differences(self):
 		assert_index_equal(
-			(
-				stock
-					.get_average_per_share_differences(
-						stock.raw_data
-					)
-				.index
-			),
+			stock.get_average_per_share_differences().index,
 			Index([
 				f'PER_SHARE_DIFF_{column}' for column in (
 					'ASSETS_DEBT',
@@ -544,12 +510,10 @@ class TestStockPup(unittest.TestCase):
 		)
 
 	def test_get_median_growth_rate(self):
-		growth_rates = stock.get_moving_average_growth_rates(stock.raw_data)
-		
 		self.assertEqual(
-			stock.get_median_growth_rate(stock.raw_data),
+			stock.get_median_growth_rate(),
 			median([
-				growth_rates[f'GROWTH_NET_{column}'] for column in (
+				stock.get_moving_average_growth_rates()[f'GROWTH_NET_{column}'] for column in (
 					'ASSETS',
 					'CASH',
 					'CASH_INVESTED',
@@ -564,36 +528,42 @@ class TestStockPup(unittest.TestCase):
 		)
 
 	def test_get_median_returns(self):
-		ratios = stock.get_moving_average_ratios(stock.raw_data)
-
+		moving_average_ratios = stock.get_moving_average_ratios()
 		self.assertEqual(
-			stock.get_median_returns(stock.raw_data),
+			stock.get_median_returns(),
 			median([
-				ratios[f'RATIO_{column}'] for column in (
-					'INCOME_ASSETS',
-					'INCOME_EQUITY',
-					'INCOME_EXPENSES',
-					'INCOME_INVESTED_CAPITAL',
-					'INCOME_TANGIBLE',
-					'FCF_ASSETS',
-					'FCF_EQUITY',
-					'FCF_EXPENSES',
-					'FCF_INVESTED_CAPITAL',
-					'FCF_TANGIBLE',
-					'FCF_SHY_ASSETS',
-					'FCF_SHY_EQUITY',
-					'FCF_SHY_EXPENSES',
-					'FCF_SHY_INVESTED_CAPITAL',
-					'FCF_SHY_TANGIBLE'
-				)
-			])
+				moving_average_ratios[
+					f'RATIO_{column}'] for column in (
+						'INCOME_ASSETS',
+						'INCOME_CASH',
+						'INCOME_CASH_INVESTED',
+						'INCOME_EQUITY',
+						'INCOME_EXPENSES',
+						'INCOME_INVESTED_CAPITAL',
+						'INCOME_TANGIBLE',
+						'FCF_ASSETS',
+						'FCF_CASH',
+						'FCF_CASH_INVESTED',
+						'FCF_EQUITY',
+						'FCF_EXPENSES',
+						'FCF_INVESTED_CAPITAL',
+						'FCF_TANGIBLE',
+						'FCF_SHY_ASSETS',
+						'FCF_SHY_CASH',
+						'FCF_SHY_CASH_INVESTED',
+						'FCF_SHY_EQUITY',
+						'FCF_SHY_EXPENSES',
+						'FCF_SHY_INVESTED_CAPITAL',
+						'FCF_SHY_TANGIBLE'
+					)
+				]
+			)
 		)
 
 	def test_get_median_safety(self):
-		safety = stock.get_average_moving_average_differences(stock.raw_data)
-		
+		safety = stock.get_average_moving_average_differences()
 		self.assertEqual(
-			stock.get_median_safety(stock.raw_data),
+			stock.get_median_safety(),
 			median([
 				safety['DIFF_ASSETS_DEBT'],
 				safety['DIFF_ASSETS_LIABILITIES'],
@@ -611,15 +581,13 @@ class TestStockPup(unittest.TestCase):
 				safety['DIFF_INCOME_LIABILITIES'],
 				safety['DIFF_TANGIBLE_DEBT'],
 				safety['DIFF_TANGIBLE_LIABILITIES'],
-				stock.get_average_moving_averages(
-					stock.raw_data
-					)['NET_WORKING_CAPITAL'],
+				stock.get_average_moving_averages()['NET_WORKING_CAPITAL'],
 			])
 		)
 
 	def test_get_averages(self):
 		assert_index_equal(
-			stock.get_averages(stock.raw_data).index,
+			stock.get_averages().index,
 			Index([
 				'AVERAGE_GROWTH',
 				'AVERAGE_RETURNS',
@@ -633,41 +601,16 @@ class TestStockPup(unittest.TestCase):
 
 	def test_stock_summary(self):
 		assert_index_equal(
-			stock.summarize(stock.raw_data).index,
+			stock.summarize().index,
 			concat([
-				stock.get_averages(stock.raw_data),
-				(
-					stock
-					.get_average_moving_average_differences(
-							stock.raw_data
-						)
-				),
-				(
-					stock
-						.get_moving_average_growth_rates(stock.raw_data)
-				),
-				(stock.get_average_moving_averages(
-						stock.raw_data
-					)
-				),
-				(
-					stock
-						.get_average_per_share_averages(
-							stock.raw_data
-						)
-				),
-				(
-					stock
-						.get_average_per_share_differences(
-							stock.raw_data
-					)
-				),
-				(
-					stock
-						.get_average_moving_average_ratios(
-							stock.raw_data
-						)
-				),
+				stock.get_averages(),
+				stock.get_average_moving_average_differences(),
+				stock.get_moving_average_growth_rates(),
+				stock.get_average_moving_averages(),
+				stock.get_average_per_share_averages(),
+				stock.get_average_per_share_differences(),
+				stock.get_average_moving_average_ratios(),
 			], axis=0).index
 		)
+	"""
 	"""

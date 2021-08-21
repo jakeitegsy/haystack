@@ -1,5 +1,5 @@
 import unittest
-from analyst import Analyst
+from stock import Stock
 from numpy import nan
 from numpy.testing import assert_equal
 
@@ -9,7 +9,7 @@ class TestGetDiscountCashFlowValue(unittest.TestCase):
     def test_dcf_valuation_sums_each_cash_flow_using_discount_rate(self):
         self.assertEqual(
             round(
-                Analyst().get_discount_cash_flow_value(
+                Stock().get_discount_cash_flow_value(
                     [1, 1.5, 1.2, 1.1]
                 ),2
             ), 
@@ -19,7 +19,7 @@ class TestGetDiscountCashFlowValue(unittest.TestCase):
     def test_dcf_valuation_when_nan_in_record(self):
         assert_equal(
             round(
-                Analyst().get_discount_cash_flow_value(
+                Stock().get_discount_cash_flow_value(
                     [
                         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, 0., 0., 
                         -0.47, -0.47, -0.235, -7.43670886, 

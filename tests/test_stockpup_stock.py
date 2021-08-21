@@ -209,83 +209,6 @@ class TestStockPup(unittest.TestCase):
 			)
 		)
 
-	def test_convert_2000_new_year_to_1999_year_end(self):
- 		self.assertFalse(
- 			(
-				stock
-			 		.convert_2000_new_year_to_1999_year_end(
-						stock.raw_data
-					)
-			)
-			.loc['2000-01-01']
-			.values.any()
-		)
-	
-	def test_set_uppercase_column_names(self):
-		assert_index_equal(
-			(
-				stock
-					.set_uppercase_column_names(stock.raw_data)
-					.columns
-			),
-			(
-				stock.raw_data
-					.rename(str.upper, axis='columns')
-					.columns
-			)
-		)
-
-	def test_rename_columns_changes_column_names(self):
-		assert_index_equal(
-			(
-				stock
-					.rename_columns(stock.raw_data)
-					.columns
-			),
-			Index([
-				'NET_SHARES_NO_SPLIT',
-				'NET_SHARES',
-				'SPLIT FACTOR',
-				'NET_ASSETS',
-				'CURRENT_ASSETS',
-				'NET_LIABILITIES',
-				'CURRENT_LIABILITIES',
-				'NET_EQUITY',
-				'NET_NONCONTROLLING',
-				'NET_PREFERRED',
-				'NET_GOODWILL',
-				'NET_DEBT',
-				'NET_REVENUE',
-				'EARNINGS',
-				'NET_INCOME',
-				'PER_SHARE_EARNINGS_BASIC',
-				'PER_SHARE_EARNINGS_DILUTED',
-				'PER_SHARE_DIVIDENDS',
-				'NET_CASH_OP',
-				'NET_CASH_INVESTED',
-				'NET_CASH_FIN',
-				'CASH CHANGE DURING PERIOD',
-				'NET_CASH',
-				'CAPITAL_EXPENDITURES',
-				'PRICE',
-				'PRICE HIGH',
-				'PRICE LOW',
-				'ROE',
-				'ROA',
-				'PER_SHARE_BOOK',
-				'P/B RATIO',
-				'P/E RATIO',
-				'PER_SHARE_CUM_DIVIDENDS',
-				'RATIO_DIVIDENDS',
-				'LONG-TERM DEBT TO EQUITY RATIO',
-				'EQUITY TO ASSETS RATIO',
-				'NET MARGIN',
-				'ASSET TURNOVER',
-				'FREE CASH FLOW PER SHARE',
-				'CURRENT RATIO'
-			])
-		)
-
 	def test_set_numeric_datatypes(self):
 		self.assertTrue(
 			(
@@ -325,20 +248,20 @@ class TestStockPup(unittest.TestCase):
 
 	def test_get_net_values(self):
 		assert_index_equal(
-			stock.net_values.columns,
+			stock.get_net_values().columns,
 			Index(self.net_columns())
 		)
 
 	def test_aggregate_keeps_same_columns_as_net_calculations(self):
 		assert_index_equal(
-			stock.aggregate.columns,
-			stock.net_values.columns
+			stock.get_aggregated_years().columns,
+			stock.get_net_values().columns
 		)
 
 	def test_moving_averages_keep_same_columns_as_net_calculations(self):
 		assert_index_equal(
 			stock.moving_averages.columns,
-			stock.net_values.columns
+			stock.get_net_values().columns
 		)
 
 	def test_get_moving_average_differences(self):
@@ -612,5 +535,3 @@ class TestStockPup(unittest.TestCase):
 				stock.get_average_moving_average_ratios(),
 			], axis=0).index
 		)
-	"""
-	"""

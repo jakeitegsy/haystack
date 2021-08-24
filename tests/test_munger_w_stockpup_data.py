@@ -13,7 +13,7 @@ class TestMungerWithStockPupData(unittest.TestCase):
     def munger(self):
         return Munger(
             ticker='BAC',
-            raw_data=self.stockpup.raw_data,
+            raw_data=self.stockpup.get_raw_data(),
             filename=self.stockpup.filename,
             mappings=self.stockpup.columns_mapping()
         )
@@ -21,7 +21,7 @@ class TestMungerWithStockPupData(unittest.TestCase):
     def test_convert_2000_new_year_to_1999_year_end_for_stockpup(self):
         self.assertFalse(
             self.munger().convert_2000_new_year_to_1999_year_end(
-                self.stockpup.raw_data
+                self.stockpup.get_raw_data()
             ).loc['2000-01-01'].values.any()
         )
 
@@ -30,11 +30,11 @@ class TestMungerWithStockPupData(unittest.TestCase):
 			(
 				self.munger()
 					.set_uppercase_column_names(
-                        self.stockpup.raw_data
+                        self.stockpup.get_raw_data()
                     ).columns
 			),
 			(
-				self.stockpup.raw_data
+				self.stockpup.get_raw_data()
 					.rename(str.upper, axis='columns')
 					.columns
 			)
@@ -45,7 +45,7 @@ class TestMungerWithStockPupData(unittest.TestCase):
 			(
                 self.munger()
 					.rename_columns(
-                        dataframe=self.stockpup.raw_data,
+                        dataframe=self.stockpup.get_raw_data(),
                         mappings=self.stockpup.columns_mapping()
                     )
 					.columns

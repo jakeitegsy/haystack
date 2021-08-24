@@ -7,6 +7,7 @@ from itertools import product
 from re import search
 from logger import Logger
 from munger import Munger
+from ratios import get_ratio
 from pandas.errors import EmptyDataError
 from pandas.api.types import is_object_dtype
 from numpy import inf, nan, median
@@ -15,53 +16,25 @@ from pandas import (
     DataFrame, Series, MultiIndex, Index, read_csv, to_numeric,
     concat
 )
-from haystack_utilities import (
-    ANALYSIS_FOLDER, INDUSTRY_FOLDER, PROCESSED_FOLDER, 
-    SECTORS_FOLDER,  STOCKPUP_FOLDER,
-    pd, list_filetype, os, test_folder, makedir
+from utilities import (
+    analysis_folder, industry_folder, processed_folder, 
+    sectors_folder,  stockpup_folder,
+    write_report,
 )
 
-def get_ratio(numerator, denominator):
-    """returns ratio for positive numbers
-        returns diff for denominators less than or equal to zero
-    """
-    x = numerator
-    y = denominator
-
-    if type(x) == pd.Series and type(y) == pd.Series:
-        # returns -abs(y) when x is 0
-        ratio1 = -abs(y[x == 0])
-        # returns -abs(x/y) when y is negative
-        ratio2 = -abs(x[(x != 0) & (y < 0)]  / y[(x != 0) & (y < 0)])
-        ratio3 = -abs(x[(x < 0) & (y > 0)] / y[(x < 0) & (y > 0)])
-        # Defines Zero Division
-        ratio4 = -abs(x[(x < 0) & (y == 0)])
-        ratio5 = x[(x > 0) & (y == 0)]
-        # regular ratio
-        ratio6 = x[(x > 0) & (y > 0)] / y[(x > 0) & (y > 0)]
-        return pd.concat([ratio1, ratio2, ratio3,
-                            ratio4, ratio5, ratio6],
-                            axis=0)
-    else:
-        # returns -abs(y) when x is 0
-        if x == 0: return -abs(y)
-        # returns -abs(x/y) when y is negative
-        if x != 0 and y < 0: return -abs(x / y)
-        if x < 0 and y > 0: return -abs(x / y)
-        # Defines Zero Division
-        if x < 0 and y == 0: return -abs(x)
-        if x > 0 and y == 0: return x
-        # regular ratio
-        if x > 0 and y > 0: return x / y
-
+def get_discount_cash_flow_value(values, discount_rate=0.0316):
+    # how can I get the discount rate from the internet?
+    return sum(
+        [
+            (values[i] / ((1 + discount_rate) ** i)) for i in range(len(values))
+        ]
+    )
 
 class Stock:
 
     def __init__(self, 
         ticker=None, 
         filename=None, 
-        to_folder=None,
-        from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}", 
         discount_rate=0.0316, 
         source="STOCKPUP"
     ):
@@ -105,7 +78,7 @@ class Stock:
         return self.set_numeric_datatypes(
             Munger(
                 ticker=self.ticker,
-                raw_data=self.raw_data,
+                raw_data=self.get_raw_data(),
                 mappings=self.columns_mapping(),
                 filename=self.filename,
             ).munged_data
@@ -140,11 +113,13 @@ class Stock:
             "NET_WORKING_CAPITAL": munged_data["CURRENT_ASSETS"] - munged_data["CURRENT_LIABILITIES"],
         })
 
+    def raw_data_status(self):
+        return f"Getting RAW data from {self.filename}::"
+
     def get_raw_data(self):
-        status = f"Getting RAW data from {self.filename}::"
         try:
-            self.logger.log(status)
-            self.raw_data = read_csv(
+            self.logger.log(self.raw_data_status())
+            return read_csv(
                 f'{self.source_folder()}/{self.filename}',
                 header=0,
                 index_col=self.get_index_column(),
@@ -153,12 +128,7 @@ class Stock:
                 engine="c",
             )
         except (ValueError, EmptyDataError):
-            self.logger.error(status)
-        else:
-            if len(self.raw_data) > 1:
-                self.logger.success(status)
-            else:
-                self.logger.error(status)
+            self.logger.error(self.raw_data_status())
 
     def fourth_quarter(self):
         return lambda x: x[0]
@@ -211,7 +181,11 @@ class Stock:
         self.logger.log('Calculating Average Differences Per Share')
         return self.add_prefix(
             self.get_average_moving_average_differences()
-                .div(self.get_average_net_shares(self.moving_averages))
+                .div(
+                    self.get_average_net_shares(
+                        self.moving_averages
+                    )
+                )
         )
 
     def get_average_per_share_averages(self):
@@ -292,20 +266,31 @@ class Stock:
             self.get_average_moving_averages()['NET_WORKING_CAPITAL']
         ])
 
+    def get_data_end(self):
+        try:
+            return self.moving_averages.index[0]
+        except IndexError:
+            return 0
+
+    def get_data_start(self):
+        try:
+            return self.moving_averages.index[1]
+        except IndexError:
+            return 0
+
     def get_averages(self):
         self.logger.log('Calculating Average Scores')
-        per_share_averages = self.get_average_per_share_averages()
         return Series({
             'AVERAGE_GROWTH': self.get_median_growth_rate(),
             'AVERAGE_RETURNS': self.get_median_returns(),
             'AVERAGE_SAFETY': self.get_median_safety(),
-            'DATA_END': self.moving_averages.index[0],
-            'DATA_START': self.moving_averages.index[1],
+            'DATA_END': self.get_data_end(),
+            'DATA_START': self.get_data_start(),
             'PER_SHARE_DCF_FORWARD': (
-                per_share_averages['PER_SHARE_NET_FCF'] 
+                self.get_average_per_share_averages()['PER_SHARE_NET_FCF'] 
               / self.discount_rate),
             'PER_SHARE_DCF_SHY_FORWARD': (
-                per_share_averages['PER_SHARE_NET_FCF_SHY'] 
+                self.get_average_per_share_averages()['PER_SHARE_NET_FCF_SHY'] 
               / self.discount_rate
             )
         })
@@ -315,9 +300,10 @@ class Stock:
             return (
                 (
                     (dataframe.iloc[-1] / dataframe.iloc[0]) 
-                        ** (1.0 / (dataframe.shape[0] - 1))) - 1
+                 ** (1.0 / (dataframe.shape[0] - 1))
+                ) - 1
             )
-        except ZeroDivisionError:
+        except (ZeroDivisionError, IndexError):
             return self.get_simple_growth_rate(dataframe)
 
     def get_simple_growth_rate(self, dataframe):
@@ -334,37 +320,11 @@ class Stock:
             prefix='GROWTH_',
         )
 
-    def get_discount_cash_flow_value(self, values):
-        return sum(
-            [
-                (values[i] / ((1 + self.discount_rate) ** i)) for i in range(len(values))
-            ]
-        )
-
-    def calc_growth(self, dataframe, using="simple"):
-        "Return Simple or Compound Growth Rate"
-        if using == "compound":            
-            try:
-                avg = (((dataframe.iloc[-1] / dataframe.iloc[0]) 
-                        ** (1 / (dataframe.shape[0] - 1))) - 1)
-            except ZeroDivisionError:
-                avg = dataframe.pct_change(axis=0)
-        else:
-            avg = dataframe.pct_change(axis=0)
-
-        avg = self.replace_null_values_with_zero(avg)
-        avg = self.correct_columns(avg, prefix="GROWTH_")
-        return avg
-
-    def get_net(self, data):
-        return self.transform_dict(net_dict)
-
     def get_dcf_valuation(self, dataframe=None, key=None):
         return (
-            dataframe[key].expanding(min_periods=1)
-                          .apply(
-                            self.get_discount_cash_flow_value, raw=True
-                           )
+            dataframe[key]
+            .expanding(min_periods=1)
+            .apply(get_discount_cash_flow_value, raw=True)
         )
 
     def add_prefix(self, dataframe, prefix='PER_SHARE_'):
@@ -376,8 +336,14 @@ class Stock:
                 self.moving_averages['NET_SHARES'], axis=0
             )
         )
-        result['PER_SHARE_DCF_HISTORIC'] = self.get_dcf_valuation(dataframe=result, key='PER_SHARE_NET_FCF')
-        result['PER_SHARE_DCF_SHY_HISTORIC'] = self.get_dcf_valuation(dataframe=result, key='PER_SHARE_NET_FCF_SHY')
+        result['PER_SHARE_DCF_HISTORIC'] = self.get_dcf_valuation(
+            dataframe=result, 
+            key='PER_SHARE_NET_FCF'
+        )
+        result['PER_SHARE_DCF_SHY_HISTORIC'] = self.get_dcf_valuation(
+            dataframe=result, 
+            key='PER_SHARE_NET_FCF_SHY'
+        )
         return result
 
     def get_ratios(self, data):
@@ -436,14 +402,20 @@ class Stock:
     def get_moving_average_sums(self):
         return self.moving_averages.apply(sum)
 
+
+
     def get_average_moving_averages(self):
-        result = self.moving_averages.iloc[-1]
-        result['NET_TANGIBLE'] = (
-            result['NET_ASSETS'] - result['NET_LIABILITIES'] - result['NET_GOODWILL']
-        )
+        try:
+            result = self.moving_averages.iloc[-1]
+        except IndexError:
+            result = self.moving_averages
+        result['NET_TANGIBLE'] = self.get_net_tangible(result)
+        # result['NET_TANGIBLE'] = (
+        #     result['NET_ASSETS'] - result['NET_LIABILITIES'] - result['NET_GOODWILL']
+        # )
         return result
 
-    def summarize(self):
+    def get_summary(self):
         return concat([
             self.get_averages(),
             self.get_average_moving_average_differences(),
@@ -453,205 +425,19 @@ class Stock:
             self.get_average_per_share_differences(),
             self.get_average_moving_average_ratios(),
         ], axis=0)
-        
-    def ratios(self):
-        return {
-            "RATIO_CASH_PRICE" : "PER_SHARE_NET_CASH",
-            "RATIO_DCF_HISTORIC_PRICE" : "PER_SHARE_DCF_HISTORIC",
-            "RATIO_DCF_SHY_HISTORIC_PRICE" : "PER_SHARE_DCF_SHY_HISTORIC",
-            "RATIO_DCF_FORWARD_PRICE" : "PER_SHARE_DCF_FORWARD",
-            "RATIO_DCF_SHY_FORWARD_PRICE" : "PER_SHARE_DCF_SHY_FORWARD",
-            "RATIO_EQUITY_PRICE" : "PER_SHARE_NET_EQUITY",
-            "RATIO_FCF_PRICE" : "PER_SHARE_NET_FCF",
-            "RATIO_FCF_SHY_PRICE" : "PER_SHARE_NET_FCF_SHY",
-            "RATIO_INCOME_PRICE" : "PER_SHARE_NET_INCOME",
-            "RATIO_TANGIBLE_PRICE" : "PER_SHARE_NET_TANGIBLE",
-        }
-
-    def calc_price_ratios(self, dataframe):
-        for (ratio, numerator) in self.ratios().items():
-            try:
-                dataframe[ratio] = dataframe[numerator] / dataframe["PER_SHARE_MARKET"]
-            except ZeroDivisionError:
-                dataframe[ratio] = 0.0
-
-
-    def combine_files(self, folder, ext="csv", header=None, 
-                      axis=0, file_col="Symbol", ignore_index=False):
-        "Returns dataframe of csv files in folder"
-        file_col = file_col.upper()
-        file_list = list_filetype(in_folder=folder, extension=ext)
-
-        dataframe_list = []
-        try:
-            for afile in file_list:
-                try:
-                    dataframe = pd.read_csv(
-                        f"{folder}{afile}", header=header, index_col=0,
-                        squeeze=True
-                    )
-                    dataframe[f"{file_col}"] = afile[:-4]
-                    dataframe_list.append(dataframe)
-                except FileNotFoundError:
-                    pass
-        except TypeError:
-            pass
-
-        combined = None
-        try:
-            combined = pd.concat(dataframe_list, axis=axis,
-                                ignore_index=ignore_index, sort=False)
-        except ValueError:
-            pass
-
-        try:
-            return combined.T.set_index(file_col)
-        except (KeyError, AttributeError):
-            return combined
 
     def replace_null_values_with_zero(self, dataframe):
         self.logger.log(f"Replaced Null Values with 0")
         return dataframe.replace([inf, -inf, nan, 'None', 'NaN'], 0)
 
-    def yahoo_finance_download(self, tickers=None, start=None):
-        if tickers is not None and start is not None:
-            return yahoo_finance.download(
-                list(tickers),
-                start=start,
-                end=datetime.date.today(),
-                as_panel=False,
-                threading=16
-            )
-
-    def get_current_prices(self, symbols="", dataframe=None):
-        """Return """
-        try:
-            tickers = dataframe.index
-        except AttributeError:
-            tickers = symbols
-        
-        today = datetime.date.today()
-        prices_today = f"prices/{str(today)}_current_prices.pkl"
-        try:
-            current_prices = pd.read_pickle(prices_today)
-        except FileNotFoundError:            
-            try:
-                prices = self.yahoo_finance_download(
-                    tickers=tickers, start=today,
-                )
-            except ValueError:
-                prices = self.yahoo_finance_download(
-                    tickers=tickers,
-                    start=today - datetime.timedelta(days=1),
-                )
-            current_prices = prices["Adj Close"].T.squeeze()
-            current_prices.to_pickle(prices_today)
-        except Exception:
-            self.logger.error("I could not download current prices, "
-                  "using last known prices instead")
-            last_known_prices = sorted(
-                list_filetype(in_folder="prices", extension="pkl")
-            )[-1]
-            return pd.read_pickle(last_known_prices)
-
-        return current_prices
-
-    def get_ticker_and_filename(self, filename=None, ticker=None, 
-                                folder=None):
-        if filename is not None:
-            ticker = os.path.split(filename)[1].split(".")[0]
-            filename = filename
-            folder = os.path.dirname(filename)
-        elif folder is not None:
-            ticker = ticker
-            filename = f"{folder}{ticker}.csv"
-        return (ticker, filename)
-
-    def judge_growth(self, rate):
-        try:
-            if rate > 0: return 'grew'
-            if rate == 0: return 'idled'
-            if rate < 0: return 'shrank'
-        except TypeError:
-            return 'ignore'    
-
-    def relative_scaler(self, series):
-        return (series / (series.max() - series.min()))
-
-    def score(self, safety=4, growth=2, price=1, dataframe=None):
-        safety_score = dataframe.SCORE_SAFETY.copy()
-        returns_score = dataframe.SCORE_RETURNS.copy()
-        growth_score = dataframe.SCORE_GROWTH.copy()
-        price_score = dataframe.SCORE_PRICE.copy()
-
-        # reward
-        safety_score[safety_score > 0] = safety
-        growth_score[growth_score > 0] = growth
-        price_score[price_score > 0] = price
-        #penalty
-        safety_score[safety_score <= 0] = 0
-        growth_score[growth_score <= 0] = 0
-        price_score[price_score <= 0] = 0
-
-        score = sum(
-            [safety_score, returns_score, growth_score, price_score]
-        ) 
-        return score / max(score)
-
-    def score_price_ratios(self, dataframe):
-        price_ratios = pd.np.mean([
-            dataframe.RATIO_CASH_PRICE,
-            dataframe.RATIO_DCF_SHY_FORWARD_PRICE,
-            dataframe.RATIO_DCF_SHY_HISTORIC_PRICE,
-            dataframe.RATIO_EQUITY_PRICE,
-            dataframe.RATIO_INCOME_PRICE,
-            dataframe.RATIO_TANGIBLE_PRICE,
-        ], axis=0)
-
-        return self.transform(price_ratios)
-
-    def sort_index(self, dataframe):
-        try:
-            return dataframe.sort_index()
-        except TypeError:
-            return dataframe
-
-    def transform_dict(self, dictionary):
-        try:
-            result = pd.DataFrame(dictionary)
-        except ValueError:
-            result = pd.Series(dictionary)
-        except pd.core.indexes.base.InvalidIndexError:
-            result = pd.DataFrame.from_dict(
-                dictionary, orient='index', dtype=pd.np.float64
-            ).T.drop_duplicates(keep='last')
-        return sort_index(result)
-
-    # def set_uppercase_labels(self, dataframe):
-    #     try:
-    #         dataframe.rename(str.upper)
-    #     except TypeError:
-    #         dataframe.rename(str.upper, axis="columns")
-    #     finally:
-    #         return dataframe
-
-    def write_report(self, dataframe=None, report='', to_file=None, 
-                     to_folder=None):
-        makedir(to_folder)
-        filename = f'{to_folder}{to_file}.csv'
-
-        try:
-            dataframe.sort_index(axis=1).to_csv(filename, header=True)
-        except (TypeError, ValueError):
-            dataframe.sort_index().to_csv(filename, header=True)
-        except AttributeError:
-            return "Invalid operation for NoneType"
-        except FileNotFoundError:
-            self.write_report(dataframe=dataframe, report=report,
-                              to_file=to_file, to_folder=to_folder)
-        
-        self.logger.log(f"writing {to_file}'s {report.lower()} "
-              f"report to '{to_folder}'")
+    def to_csv(self, output_folder):
+        self.logger.log(f'Writing {self.ticker} summary to csv')
+        write_report(
+            dataframe=self.get_summary(),
+            report='summary',
+            to_file=self.ticker,
+            to_folder=output_folder,
+        )
 
 
 class StockPup(Stock):
@@ -660,7 +446,6 @@ class StockPup(Stock):
         self.ticker = ticker if ticker else self.get_ticker(filename)
         self.filename = filename if filename else self.get_filename(ticker)
         super().__init__(ticker=self.ticker, filename=self.filename)
-        self.get_raw_data()
         self.get_moving_averages() 
 
     def get_filename(self, ticker):
@@ -778,7 +563,7 @@ class StockPup(Stock):
         }
 
     def get_aggregated_years(self):
-        status = 'Aggregating quarters to years'
+        self.logger.log('Aggregating quarters to years')
         return self.get_net_values().groupby(
             level='YEAR'
         ).agg(self.aggregate_mappings())
@@ -801,7 +586,6 @@ class Edgar(Stock):
         self.ticker = ticker if ticker else self.get_ticker(filename)
         self.filename = filename if filename else self.get_filename(ticker)
         super().__init__(ticker=self.ticker, filename=self.filename)
-        self.get_raw_data()
         self.get_moving_averages() 
 
     def get_filename(self, ticker):
@@ -817,14 +601,13 @@ class Edgar(Stock):
         return 'fiscal_year'
 
     def set_index(self, dataframe):
-        status = f"Setting Index to Years::"
         try:
             dataframe.index = dataframe.index.year
             dataframe.index.name = 'YEAR'
         except AttributeError:
-            self.logger.error(status)
+            self.logger.error("Setting Index to Years::")
         else:
-            self.logger.success(status)
+            self.logger.success("Setting Index to Years::")
         finally:
             return dataframe
 
@@ -902,12 +685,13 @@ class Edgar(Stock):
 
 
 class AssignSector(Stock):
-    """"""
     
-    def __init__(self, ticker=None, filename=None,
-                 to_folder=f"{ANALYSIS_FOLDER}{SECTORS_FOLDER}"):
+    def __init__(
+        self, ticker=None, filename=None,
+        to_folder=analysis_folder(sectors_folder())
+    ):
         super().__init__(ticker=ticker, filename=filename, 
-                         to_folder=to_folder, from_folder=SECTORS_FOLDER)
+                         to_folder=to_folder, from_folder=sectors_folder)
         self.folder = to_folder
         self.sectors = {
             "XLY": "CONSUMER_DISCRETIONARY",
@@ -922,7 +706,7 @@ class AssignSector(Stock):
             "XLU": "UTILITIES"
         }
 
-        self.symbols = pd.read_csv(
+        self.symbols = read_csv(
             self.filename, header=1,
             usecols=["Symbol", "Company Name"], index_col="Symbol"
         )
@@ -931,7 +715,7 @@ class AssignSector(Stock):
         })
         self.symbols["SECTOR"] = self.sectors[self.ticker]
 
-        self.write_report(
+        write_report(
             dataframe=self.symbols, report="Sectors",
             to_file=self.ticker, to_folder=self.folder, 
         )
@@ -940,10 +724,10 @@ class AssignSector(Stock):
 class AssignIndustry(Stock):
     
     def __init__(self, ticker=None, filename=None,
-                 to_folder=f"{ANALYSIS_FOLDER}{INDUSTRY_FOLDER}"):
+                 to_folder=f"{analysis_folder}{industry_folder}"):
         super().__init__(ticker=ticker, filename=filename, 
                          to_folder=to_folder, 
-                         from_folder=INDUSTRY_FOLDER)
+                         from_folder=industry_folder)
         self.folder = to_folder
         self.symbols = pd.read_csv(
             self.filename,
@@ -957,7 +741,7 @@ class AssignIndustry(Stock):
             "Industry": "INDUSTRY",
         })
 
-        self.write_report(
+        write_report(
             dataframe=self.symbols, report="Industry",
             to_file=self.ticker, to_folder=self.folder, 
         )

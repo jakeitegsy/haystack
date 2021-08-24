@@ -6,9 +6,8 @@ from pandas.api.types import is_numeric_dtype
 from pandas import Index, concat
 from numpy import median
 
-
 stock = Stock(source='EDGAR', ticker='A').get_stock()
-# raw_data = stock.get_raw_data()
+
 
 
 class TestEdgar(unittest.TestCase):
@@ -35,7 +34,7 @@ class TestEdgar(unittest.TestCase):
 
     def test_set_index_creates_multi_index_of_years_and_quarters(self):
         assert_index_equal(
-            stock.set_index(stock.raw_data).index,
+            stock.set_index(stock.get_raw_data()).index,
             Index(
                 [
                     2012, 2019, 2011, 2013, 2011, 2011, 2011, 2011, 
@@ -50,7 +49,7 @@ class TestEdgar(unittest.TestCase):
 
     def test_raw_data_columns(self):
         assert_index_equal(
-            stock.raw_data.columns,
+            stock.get_raw_data().columns,
             Index([
                 'symbol', 
                 'end_date', 
@@ -79,7 +78,7 @@ class TestEdgar(unittest.TestCase):
 
     def test_set_numeric_datatypes(self):
         self.assertTrue(
-            stock.set_numeric_datatypes(stock.raw_data)
+            stock.set_numeric_datatypes(stock.get_raw_data())
                    .dtypes.apply(is_numeric_dtype).all()
         )
 
@@ -390,7 +389,7 @@ class TestEdgar(unittest.TestCase):
 
     def test_stock_summary(self):
         assert_index_equal(
-            stock.summarize().index,
+            stock.get_summary().index,
             concat([
                 stock.get_averages(),
                 stock.get_average_moving_average_differences(),

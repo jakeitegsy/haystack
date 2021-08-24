@@ -13,7 +13,7 @@ class TestMungerWithEdgarData(unittest.TestCase):
     def munger(self):
         return Munger(
             ticker='A',
-            raw_data=self.edgar.raw_data,
+            raw_data=self.edgar.get_raw_data(),
             filename=self.edgar.filename,
             mappings=self.edgar.columns_mapping()
         )
@@ -21,16 +21,16 @@ class TestMungerWithEdgarData(unittest.TestCase):
     def test_convert_2000_new_year_to_1999_year_end(self):
         self.assertFalse(
             self.munger().convert_2000_new_year_to_1999_year_end(
-                self.edgar.raw_data
+                self.edgar.get_raw_data()
             ).loc['2000-01-01'].values.any()
         )
 
     def test_set_uppercase_column_names(self):
         assert_index_equal(
             self.munger().set_uppercase_column_names(
-                self.edgar.raw_data
+                self.edgar.get_raw_data()
             ).columns,
-            self.edgar.raw_data.rename(
+            self.edgar.get_raw_data().rename(
                 str.upper, axis='columns'
             ).columns
         )
@@ -38,7 +38,7 @@ class TestMungerWithEdgarData(unittest.TestCase):
     def test_rename_columns(self):
         assert_index_equal(
             self.munger().rename_columns(
-                dataframe=self.edgar.raw_data,
+                dataframe=self.edgar.get_raw_data(),
                 mappings=self.edgar.columns_mapping(),
             ).columns,
             Index([

@@ -1,8 +1,8 @@
 import unittest
 
 from haystack_analyst import AssignIndustry
-from haystack_utilities import (
-    PROCESSED_FOLDER, INDUSTRY_FOLDER, TEST_FOLDER, ANALYSIS_FOLDER,
+from utilities import (
+    processed_folder, industry_folder, testing_folder, analysis_folder,
     random_ticker, os, pd
 )
 
@@ -10,12 +10,12 @@ class TestAssignIndustries(unittest.TestCase):
 
     def setUp(self):
         self.ticker = random_ticker(
-            from_folder=INDUSTRY_FOLDER,
+            from_folder=industry_folder,
         )
         self.industry = AssignIndustry(
             self.ticker,
-            to_folder=(f'{TEST_FOLDER}{PROCESSED_FOLDER}'
-                       f'{ANALYSIS_FOLDER}{INDUSTRY_FOLDER}')
+            to_folder=(f'{testing_folder}{processed_folder}'
+                       f'{analysis_folder}{industry_folder}')
         )
         self.symbols = self.industry.symbols
 

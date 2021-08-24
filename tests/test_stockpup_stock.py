@@ -1,14 +1,13 @@
 import unittest
 import re
-import os
-os.system('') 
+
 from stock import Stock
 from numpy import median
 from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
-stock = Stock(source='STOCKPUP', ticker='BAC').get_stock()
+stock = Stock(source='STOCKPUP', ticker='BHF').get_stock()
 
 
 class TestStockPup(unittest.TestCase):
@@ -36,7 +35,7 @@ class TestStockPup(unittest.TestCase):
 
 	def test_raw_data_columns(self):
 		assert_index_equal(
-			stock.raw_data.columns,
+			stock.get_raw_data().columns,
 			Index([
 				'Shares', 
 				'Shares split adjusted', 
@@ -83,7 +82,7 @@ class TestStockPup(unittest.TestCase):
 
 	def test_set_index_creates_multi_index_of_years_and_quarters(self):
 		assert_index_equal(
-			stock.set_index(stock.raw_data).index,
+			stock.set_index(stock.get_raw_data()).index,
 			MultiIndex.from_tuples([
 				(2018, 1),
 	            (2017, 4),
@@ -187,7 +186,7 @@ class TestStockPup(unittest.TestCase):
 		)
 
 	def annual_data(self):
-		return stock.get_annual_data(stock.raw_data)
+		return stock.get_annual_data(stock.get_raw_data())
 
 	def test_get_annual_data_drops_years_without_4_quarters(self):
 		for year in self.annual_data().index.levels[0]:
@@ -202,7 +201,7 @@ class TestStockPup(unittest.TestCase):
 			(
 				stock
 					.replace_null_values_with_zero(
-						stock.raw_data
+						stock.get_raw_data()
 					)
 				.isna()
 				.values.any()
@@ -213,7 +212,7 @@ class TestStockPup(unittest.TestCase):
 		self.assertTrue(
 			(
 				stock
-					.set_numeric_datatypes(stock.raw_data)
+					.set_numeric_datatypes(stock.get_raw_data())
 					.dtypes.apply(is_numeric_dtype)
 					.all()
 			)
@@ -524,7 +523,7 @@ class TestStockPup(unittest.TestCase):
 
 	def test_stock_summary(self):
 		assert_index_equal(
-			stock.summarize().index,
+			stock.get_summary().index,
 			concat([
 				stock.get_averages(),
 				stock.get_average_moving_average_differences(),

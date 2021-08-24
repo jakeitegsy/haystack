@@ -1,9 +1,10 @@
 import unittest
 
-from haystack_analyst import AssignSector
-from haystack_utilities import (
-    PROCESSED_FOLDER, SECTORS_FOLDER, TEST_FOLDER, ANALYSIS_FOLDER,
-    random_ticker, os, pd
+from stock import AssignSector
+from pandas import DataFrame
+from os import path
+from utilities import (
+    processed_folder, sectors_folder, testing_folder, analysis_folder, random_ticker
 )
 
 
@@ -11,17 +12,15 @@ class TestSectors(unittest.TestCase):
 
     def setUp(self):
         self.ticker = random_ticker(
-            from_folder=f"{PROCESSED_FOLDER}{SECTORS_FOLDER}"
+            from_folder=f"{processed_folder}{sectors_folder}"
         )
         self.sector = AssignSector(
             self.ticker,
-            to_folder=(f'{TEST_FOLDER}{PROCESSED_FOLDER}'
-                       f'{ANALYSIS_FOLDER}{SECTORS_FOLDER}')
+            to_folder=testing_folder(processed_folder(analysis_folder(sectors_folder())))
         )
-    """
     def test_sector_contains_10_items(self):
         self.assertEqual(len(self.sector.sectors), 10)
-
+    """
     def test_sector_XLY_returns_consumer_discretionary(self):
         self.assertEqual(
             self.sector.sectors['XLY'], 'CONSUMER_DISCRETIONARY'
@@ -63,7 +62,7 @@ class TestAssignSectors(TestSectors):
         self.symbols = self.sector.symbols
 
     def test_read_sectors_and_symbols_returns_dataframe(self):
-        self.assertIs(type(self.symbols), pd.DataFrame)
+        self.assertIs(type(self.symbols), DataFrame)
 
     def test_column_names(self):
         self.assertEqual(
@@ -84,7 +83,7 @@ class TestWriteSector(TestSectors):
         super().setUp()
 
     def test_write_sectors_writes_csv_to_sectors_folder(self):
-        self.assertTrue(os.path.exists(f"{self.sector.folder}/"
+        self.assertTrue(path.exists(f"{self.sector.folder}/"
                                        f"{self.ticker}.CSV"))
 
 

@@ -1,34 +1,37 @@
-from haystack_utilities import (
-    ANALYSIS_FOLDER, EDGAR_FOLDER, INDUSTRY_FOLDER,
-    STOCKPUP_FOLDER, SECTORS_FOLDER, PROCESSED_FOLDER,
-    benchmark, munge_data, list_filetype
+
+from utilities import (
+    analysis_folder, edgar_folder, industry_folder,
+    stockpup_folder, sectors_folder, processed_folder,
+    benchmark, munge_data
 )
-from haystack_munger import Munge
-from haystack_stock import Edgar, Stockpup
-from haystack_analyst import AssignIndustry, AssignSector
-from haystack_sectors import Sectors
-from haystack_industries import Industries
-from haystack_industry import Industry
-from haystack_sector import Sector
+# from haystack_munger import Munge
+from stock import Edgar, StockPup, AssignIndustry, AssignSector
+from sectors import Sectors
+from industries import Industries
+from industry import Industry
+from sector import Sector
+from os import listdir
+from multiprocessing import Pool
+
+import time
 
 def munge_sectors():
-    """Clean SPDRS data and write files to SECTORS_FOLDER, removing
-    extra info
+    """Clean SPDRS data and write files to sectors_folder, 
+    removing extra info
     """
-    benchmark(
-        report="SECTORS_MUNGE",
-        job=munge_data,
-        from_folder=SECTORS_FOLDER,
-        to_folder=f"{PROCESSED_FOLDER}{SECTORS_FOLDER}",
-        using=Munge,
-    )
+    # benchmark(
+    #     report="SECTORS_MUNGE",
+    #     job=munge_data,
+    #     from_folder=sectors_folder(),
+    #     to_folder=processed_folder(sectors_folder()),
+    #     munger=Munge,
+    # )
     benchmark(
         report="ASSIGN_SECTORS",
         job=munge_data,
-        from_folder=f"{PROCESSED_FOLDER}{SECTORS_FOLDER}",
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}"),
-        using=AssignSector,
+        from_folder=processed_folder(sectors_folder()),
+        to_folder=processed_folder(analysis_folder(sectors_folder())),
+        munger=AssignSector,
     )
 
 def assign_industries():
@@ -36,10 +39,9 @@ def assign_industries():
     benchmark(
         report="ASSIGN_INDUSTRIES",
         job=munge_data,
-        from_folder=INDUSTRY_FOLDER,
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{INDUSTRY_FOLDER}"),
-        using=AssignIndustry,
+        from_folder=industry_folder(),
+        to_folder=processed_folder(analysis_folder(industry_folder())),
+        munger=AssignIndustry,
     )
 
 def assign_sectors():
@@ -47,30 +49,9 @@ def assign_sectors():
     benchmark(
         report="ASSIGN_SECTOR",
         job=munge_data,
-        from_foler=SECTORS_FOLDER,
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}"),
-        using=AssignSector,
-    )  
-
-def munge_stockpup():
-    # Clean Stockpup data and write files to STOCKPUP_FOLDER
-    benchmark(
-        report="STOCKPUP_MUNGE",
-        job=munge_data,
-        from_folder=STOCKPUP_FOLDER,
-        to_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}",
-        using=Munge,
-    )
-
-def munge_edgar():
-    # Clean Edgar data and write files to STOCKPUP_FOLDER
-    benchmark(
-        report="EDGAR_MUNGE",
-        job=munge_data,
-        from_folder=EDGAR_FOLDER,
-        to_folder=f"{PROCESSED_FOLDER}{EDGAR_FOLDER}",
-        using=Munge,
+        from_foler=sectors_folder(),
+        to_folder=processed_folder(analysis_folder(sectors_folder())),
+        munger=AssignSector,
     )
 
 def analyze_stockpup():
@@ -78,10 +59,11 @@ def analyze_stockpup():
     benchmark(
         report="ANALYZE_STOCKPUP_DATA",
         job=munge_data,
-        from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}",
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{STOCKPUP_FOLDER}"),
-        using=Stockpup,
+        from_folder=processed_folder(stockpup_folder()),
+        to_folder=processed_folder(
+            analysis_folder(stockpup_folder())
+        ),
+        munger=StockPup,
     )
     
 def analyze_edgar():
@@ -89,35 +71,29 @@ def analyze_edgar():
     benchmark(
         report="ANALYZE_EDGAR_DATA",
         job=munge_data,
-        from_folder=f"{PROCESSED_FOLDER}{EDGAR_FOLDER}",
-        to_folder=f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}{EDGAR_FOLDER}",
-        using=Edgar,
+        from_folder=processed_folder(edgar_folder()),
+        to_folder=processed_folder(analysis_folder(edgar_folder())),
+        munger=Edgar,
     )
 
 def stockpup_sectors():
-    # Analyze Stockpup data with SPDR Sector Information
+    # Analyze StockPup data with SPDR Sector Information
     benchmark(
         report="ANALYZE_STOCKPUP_SECTORS",
         job=Sectors,
-        sectors_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                        f"{SECTORS_FOLDER}"), 
-        stocks_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                       f"{STOCKPUP_FOLDER}"), 
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}{STOCKPUP_FOLDER}"),
+        sectors_folder=processed_folder(analysis_folder(sectors_folder())), 
+        stocks_folder=processed_folder(analysis_folder(stockpup_folder())), 
+        to_folder=processed_folder(analysis_folder(sectors_folder(stockpup_folder()))),
     )
 
 def stockpup_industries():
-    #Analyze Stockpup data with NASDAQ Industry Information
+    #Analyze StockPup data with NASDAQ Industry Information
     benchmark(
         report="ANALYZE_STOCKPUP_INDUSTRIES",
         job=Industries,
-        industry_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                         f"{INDUSTRY_FOLDER}"),
-        stocks_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                       f"{STOCKPUP_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{INDUSTRY_FOLDER}{STOCKPUP_FOLDER}")
+        industry_folder=processed_folder(analysis_folder(industry_folder())),
+        stocks_folder=processed_folder(analysis_folder(stockpup_folder())),
+        to_folder=processed_folder(analysis_folder(industry_folder(stockpup_folder()))),
     )
 
 def edgar_sectors():
@@ -125,12 +101,9 @@ def edgar_sectors():
     benchmark(
         report="ANALYZE_EDGAR_SECTORS",
         job=Sectors,
-        sectors_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                        f"{SECTORS_FOLDER}"),
-        stocks_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                       f"{EDGAR_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}{EDGAR_FOLDER}"),
+        sectors_folder=processed_folder(analysis_folder(sectors_folder())),
+        stocks_folder=processed_folder(analysis_folder(edgar_folder())),
+        to_folder=processed_folder(analysis_folder(sectors_folder(edgar_folder()))),
     )
 
 def edgar_industries():
@@ -138,12 +111,9 @@ def edgar_industries():
     benchmark(
         report="ANALYZE_EDGAR_INDUSTRIES",
         job=Industries,
-        industry_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                        f"{INDUSTRY_FOLDER}"),
-        stocks_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                       f"{EDGAR_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{INDUSTRY_FOLDER}{EDGAR_FOLDER}"),
+        industry_folder=processed_folder(analysis_folder(industry_folder())),
+        stocks_folder=processed_folder(analysis_folder(edgar_folder())),
+        to_folder=processed_folder(analysis_folder(industry_folder(edgar_folder()))),
     )
     
 def write_stockpup_sector_reports():
@@ -151,12 +121,9 @@ def write_stockpup_sector_reports():
     benchmark(
         report="WRITE_SCORE_TOTAL_REPORTS",
         job=munge_data,
-        from_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                     f"{SECTORS_FOLDER}{STOCKPUP_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}{STOCKPUP_FOLDER}"
-                   "score_total_reports/"),
-        using=Sector,
+        from_folder=processed_folder(analysis_folder(sectors_folder(stockpup_folder()))),
+        to_folder=processed_folder(analysis_folder(sectors_folder(stockpup_folder("score_total_reports/")))),
+        munger=Sector,
     )
 
 def write_stockpup_industry_reports():
@@ -164,12 +131,9 @@ def write_stockpup_industry_reports():
     benchmark(
         report="WRITE_SCORE_TOTAL_REPORTS",
         job=munge_data,
-        from_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                     f"{INDUSTRY_FOLDER}{STOCKPUP_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{INDUSTRY_FOLDER}{STOCKPUP_FOLDER}"
-                   "score_total_reports/"),
-        using=Industry,
+        from_folder=processed_folder(analysis_folder(industry_folder(stockpup_folder()))),
+        to_folder=processed_folder(analysis_folder(industry_folder(stockpup_folder("score_total_reports/")))),
+        munger=Industry,
     )
     
 def write_edgar_sector_reports():
@@ -177,12 +141,12 @@ def write_edgar_sector_reports():
     benchmark(
         report="WRITE_SCORE_TOTAL_REPORTS",
         job=munge_data,
-        from_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                     f"{SECTORS_FOLDER}{EDGAR_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{SECTORS_FOLDER}{EDGAR_FOLDER}"
+        from_folder=(f"{processed_folder()}{analysis_folder()}"
+                     f"{sectors_folder()}{edgar_folder()}"),
+        to_folder=(f"{processed_folder()}{analysis_folder()}"
+                   f"{sectors_folder()}{edgar_folder()}"
                    "score_total_reports/"),
-        using=Sector,
+        munger=Sector,
     )
 
 def write_edgar_industry_reports():
@@ -190,27 +154,70 @@ def write_edgar_industry_reports():
     benchmark(
         report="WRITE_SCORE_TOTAL_REPORTS",
         job=munge_data,
-        from_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                     f"{INDUSTRY_FOLDER}{EDGAR_FOLDER}"),
-        to_folder=(f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-                   f"{INDUSTRY_FOLDER}{EDGAR_FOLDER}"
-                   "score_total_reports/"),
-        using=Industry,
+        from_folder=processed_folder(analysis_folder(industry_folder(edgar_folder()))),
+        to_folder=processed_folder(analysis_folder(industry_folder(edgar_folder("score_total_reports/")))),
+        munger=Industry,
     )
 
+def time_it(function, *args, **kwargs):
+    start_time = time.time()
+    function(*args, **kwargs)
+    print(f"Total Execution Time: {time.time()-start_time}  ms\n")
+
+
+def process_all_files(stock, source=None):
+    start_time = time.time()
+    failed = []
+    for filename in listdir(source):
+        try:
+            stock(filename=filename).to_csv(processed_folder(source))
+        except Exception as error:
+            print('[ERROR]::Could not process::', filename)
+            failed.append(filename)
+    print('[FAILED]:', failed)
+    print(f"Total Execution Time: {time.time()-start_time}  ms\n")
+
+def process_file(stock, filename=None, source=None):
+    try:
+        stock(filename=filename).to_csv(processed_folder(source))
+    except Exception as error:
+        print('[ERROR]::Could not process::', filename)
+
+def process_stockpup(filename=None):
+    StockPup(filename=filename).to_csv(processed_folder(stockpup_folder()))
+
+def parallel_process_stockpup():
+    Pool(16).map(process_stockpup, listdir(stockpup_folder())) 
+
 if __name__ == '__main__':
-    munge_sectors()
-    munge_stockpup()
-    munge_edgar()
-    assign_industries()
-    assign_sectors()
-    analyze_stockpup()
-    analyze_edgar()
-    stockpup_sectors()
-    stockpup_industries()
-    edgar_sectors()
-    edgar_industries()
-    write_stockpup_sector_reports()
-    write_stockpup_industry_reports()
-    write_edgar_sector_reports()
-    write_edgar_industry_reports()
+    # munge_sectors()
+    # assign_industries()
+    # assign_sectors()
+    # analyze_stockpup()
+    # analyze_edgar()
+    # stockpup_sectors()
+    # stockpup_industries()
+    # edgar_sectors()
+    # edgar_industries()
+    # write_stockpup_sector_reports()
+    # write_stockpup_industry_reports()
+    # write_edgar_sector_reports()
+    # write_edgar_industry_reports()
+    # process_all_files(stock=StockPup, source=stockpup_folder())
+    # process_all_files(stock=Edgar, source=edgar_folder())
+    time_it(parallel_process_stockpup)
+    """
+    StockPup Failures:
+    ['BHF_quarterly_financial_data.csv', 'ZTS_quarterly_financial_data.csv', 
+    '.DS_Store', 
+    'INFO_quarterly_financial_data.csv', 'HOLX_quarterly_financial_data.csv', 'HSIC_quarterly_financial_data.csv', 'FTV_quarterly_financial_data.csv', 'KHC_quarterly_financial_data.csv', 'CHD_quarterly_financial_data.csv', 'QRVO_quarterly_financial_data.csv', 'KORS_quarterly_financial_data.csv', 'JNY_quarterly_financial_data.csv', 'BDK_quarterly_financial_data.csv', 'MHK_quarterly_financial_data.csv', 
+    'WIKI-PRICES-2.csv', 
+    'CSRA_quarterly_financial_data.csv', 'LSTR_quarterly_financial_data.csv', 
+    'Flight Plan (1).docx']
+    
+    Edgar Failures:
+    """
+
+# get to a complete working state then go back and fine tune 
+# how can I get to a MVP of the final product
+# what is the simplest version of the final product I can have now?

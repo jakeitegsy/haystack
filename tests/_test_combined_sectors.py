@@ -1,17 +1,17 @@
 import unittest
 
 from haystack_sectors import Sectors
-from haystack_utilities import (
-    ANALYSIS_FOLDER, EDGAR_FOLDER, PROCESSED_FOLDER, SECTORS_FOLDER, 
-    STOCKPUP_FOLDER, TEST_FOLDER, list_filetype, os, pd,
+from utilities import (
+    analysis_folder, edgar_folder, processed_folder, sectors_folder, 
+    stockpup_folder, testing_folder, list_filetype, os, pd,
 )
 
-folder = f"{TEST_FOLDER}{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
-sectors_folder = f"{folder}{SECTORS_FOLDER}"
-edgar_folder = f"{folder}{EDGAR_FOLDER}"
-stockpup_folder = f"{folder}{STOCKPUP_FOLDER}"
-edgar_out = f"{sectors_folder}{EDGAR_FOLDER}"
-stockpup_out = f"{sectors_folder}{STOCKPUP_FOLDER}"
+folder = f"{testing_folder}{processed_folder}{analysis_folder}"
+sectors_folder = f"{folder}{sectors_folder}"
+edgar_folder = f"{folder}{edgar_folder}"
+stockpup_folder = f"{folder}{stockpup_folder}"
+edgar_out = f"{sectors_folder}{edgar_folder}"
+stockpup_out = f"{sectors_folder}{stockpup_folder}"
 
 """
 def test_prep(sectors_folder=None, stocks_folder=None, to_folder=None):

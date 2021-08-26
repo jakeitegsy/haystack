@@ -162,11 +162,9 @@ def write_edgar_industry_reports():
 def time_it(function, *args, **kwargs):
     start_time = time.time()
     function(*args, **kwargs)
-    print(f"Total Execution Time: {time.time()-start_time}  ms\n")
+    print(f"Total Execution Time: {time.time()-start_time}  seconds\n")
 
-
-def process_all_files(stock, source=None):
-    start_time = time.time()
+def process_all_files(stock=None, source=None):
     failed = []
     for filename in listdir(source):
         try:
@@ -175,7 +173,6 @@ def process_all_files(stock, source=None):
             print('[ERROR]::Could not process::', filename)
             failed.append(filename)
     print('[FAILED]:', failed)
-    print(f"Total Execution Time: {time.time()-start_time}  ms\n")
 
 def process_file(stock, filename=None, source=None):
     try:
@@ -183,11 +180,21 @@ def process_file(stock, filename=None, source=None):
     except Exception as error:
         print('[ERROR]::Could not process::', filename)
 
-def process_stockpup(filename=None):
-    StockPup(filename=filename).to_csv(processed_folder(stockpup_folder()))
+def process_stockpup(filename):
+    process_file(StockPup, filename=filename, source=stockpup_folder())
 
-def parallel_process_stockpup():
-    Pool(16).map(process_stockpup, listdir(stockpup_folder())) 
+def process_edgar(filename):
+    process_file(Edgar, filename=filename, source=edgar_folder())
+    
+def parallel_process_stock():
+    with Pool(16) as pool:
+        pool.map(process_stockpup, listdir(stockpup_folder()), 2) 
+        pool.map(process_edgar, listdir(edgar_folder())) 
+    # StockPup parallel with 16 processes = 86seconds
+    # StockPup sequential = 117 seconds
+    # StockPup with cpu_count = 97 seconds
+    # StockPup with imap - no file creation - learn to use imap
+    # StockPup with 100 processes = 127 seconds
 
 if __name__ == '__main__':
     # munge_sectors()
@@ -203,9 +210,9 @@ if __name__ == '__main__':
     # write_stockpup_industry_reports()
     # write_edgar_sector_reports()
     # write_edgar_industry_reports()
-    # process_all_files(stock=StockPup, source=stockpup_folder())
-    # process_all_files(stock=Edgar, source=edgar_folder())
-    time_it(parallel_process_stockpup)
+    # time_it(process_all_files, stock=StockPup, source=stockpup_folder())
+    # time_it(process_all_files, stock=Edgar, source=edgar_folder())
+    time_it(parallel_process_stock)
     """
     StockPup Failures:
     ['BHF_quarterly_financial_data.csv', 'ZTS_quarterly_financial_data.csv', 

@@ -7,7 +7,7 @@ from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
-stock = Stock(source='STOCKPUP', ticker='BHF').get_stock()
+stock = Stock(source='STOCKPUP', ticker='BAC').get_stock()
 
 
 class TestStockPup(unittest.TestCase):
@@ -534,3 +534,5 @@ class TestStockPup(unittest.TestCase):
 				stock.get_average_moving_average_ratios(),
 			], axis=0).index
 		)
+
+# process files in parallel

@@ -5,7 +5,6 @@ import re
 import src.stock
 import unittest
 
-from numpy import median
 from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
@@ -438,7 +437,7 @@ class TestStockPup(jadecobra.tester.TestCase):
     def test_get_median_growth_rate(self):
         self.assertEqual(
             STOCK.get_median_growth_rate(),
-            median([
+            numpy.median([
                 STOCK.get_moving_average_growth_rates()[f'GROWTH_NET_{column}'] for column in (
                     'ASSETS',
                     'CASH',
@@ -457,7 +456,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         moving_average_ratios = STOCK.get_moving_average_ratios()
         self.assertEqual(
             STOCK.get_median_returns(),
-            median([
+            numpy.median([
                 moving_average_ratios[
                     f'RATIO_{column}'] for column in (
                         'INCOME_ASSETS',
@@ -490,7 +489,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         safety = STOCK.get_average_moving_average_differences()
         self.assertEqual(
             STOCK.get_median_safety(),
-            median([
+            numpy.median([
                 safety['DIFF_ASSETS_DEBT'],
                 safety['DIFF_ASSETS_LIABILITIES'],
                 safety['DIFF_CASH_DEBT'],

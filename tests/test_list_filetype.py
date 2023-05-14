@@ -1,6 +1,6 @@
 import unittest
 
-from utilities import (
+from src.utilities import (
     list_filetype, edgar_folder, sectors_folder, stockpup_folder
 )
 
@@ -19,7 +19,7 @@ class TestListFileType(unittest.TestCase):
                 list_filetype(
                     in_folder=stockpup_folder(), extension="csv"
                 )
-            ), 
+            ),
             0
         )
 
@@ -29,7 +29,7 @@ class TestListFileType(unittest.TestCase):
                 list_filetype(
                     in_folder=edgar_folder(), extension='doc'
                 )
-            ), 
+            ),
             0
         )
 
@@ -39,7 +39,7 @@ class TestListFileType(unittest.TestCase):
                 list_filetype(
                     in_folder=sectors_folder(), extension="bad ext"
                 )
-            ), 
+            ),
             0
         )
 

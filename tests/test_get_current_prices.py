@@ -1,7 +1,6 @@
 import unittest
 
-from haystack_analyst import Analyst
-from haystack_utilities import pd
+from src.haystack_analyst import Analyst
 
 @unittest.skip
 class TestGetCurrentPrices(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from stock import Stock
+from src.stock import Stock
 from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, concat
@@ -14,21 +14,21 @@ class TestEdgar(unittest.TestCase):
 
     def test_source_folder_for_edgar_data(self):
         self.assertEqual(
-            stock.source_folder(), 
+            stock.source_folder(),
             'edgar_data'
         )
-    
+
     def test_edgar_filename_when_ticker_provided(self):
         self.assertEqual(
             Stock(
                 ticker='GOOG', source='EDGAR'
-            ).get_stock().filename, 
+            ).get_stock().filename,
             'GOOG.csv'
         )
 
     def test_ticker_when_filename_is_given(self):
         self.assertEqual(
-            Stock(source='EDGAR', filename='GOOG.csv').get_stock().ticker, 
+            Stock(source='EDGAR', filename='GOOG.csv').get_stock().ticker,
             'GOOG'
         )
 
@@ -37,13 +37,13 @@ class TestEdgar(unittest.TestCase):
             stock.set_index(stock.get_raw_data()).index,
             Index(
                 [
-                    2012, 2019, 2011, 2013, 2011, 2011, 2011, 2011, 
-                    2012, 2013, 2013, 2014, 2014, 2012, 2013, 2009, 
-                    2010, 2010, 2009, 2014, 2015, 2016, 2016, 2015, 
-                    2014, 2010, 2015, 2015, 2016, 2016, 2017, 2017, 
+                    2012, 2019, 2011, 2013, 2011, 2011, 2011, 2011,
+                    2012, 2013, 2013, 2014, 2014, 2012, 2013, 2009,
+                    2010, 2010, 2009, 2014, 2015, 2016, 2016, 2015,
+                    2014, 2010, 2015, 2015, 2016, 2016, 2017, 2017,
                     2010, 2017, 2017, 2018, 2018, 2018, 2018
-                ], 
-                dtype='int64', name='YEAR'
+                ],
+                dtype='int32', name='YEAR'
             )
         )
 
@@ -51,27 +51,27 @@ class TestEdgar(unittest.TestCase):
         assert_index_equal(
             stock.get_raw_data().columns,
             Index([
-                'symbol', 
-                'end_date', 
-                'amend', 
-                'period_focus', 
-                'doc_type', 
+                'symbol',
+                'end_date',
+                'amend',
+                'period_focus',
+                'doc_type',
                 'revenues',
-                'op_income', 
-                'net_income', 
-                'eps_basic', 
-                'eps_diluted', 
+                'op_income',
+                'net_income',
+                'eps_basic',
+                'eps_diluted',
                 'dividend',
                 'assets',
-                'cur_assets', 
-                'cur_liab', 
-                'cash', 
-                'equity', 
+                'cur_assets',
+                'cur_liab',
+                'cash',
+                'equity',
                 'cash_flow_op',
-                'cash_flow_inv', 
-                'cash_flow_fin', 
-                'debt', 
-                'goodwill', 
+                'cash_flow_inv',
+                'cash_flow_fin',
+                'debt',
+                'goodwill',
                 'cap_ex'
             ])
         )

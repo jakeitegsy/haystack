@@ -1,7 +1,7 @@
 import unittest
 
 from os import path
-from utilities import makedir, janitor, testing_folder
+from src.utilities import makedir, janitor, testing_folder
 
 
 class TestMakeDirAndJanitor(unittest.TestCase):

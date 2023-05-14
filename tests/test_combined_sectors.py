@@ -1,9 +1,9 @@
 import unittest
 
-from haystack_sectors import Sectors
-from utilities import (
-    analysis_folder, edgar_folder, processed_folder, sectors_folder, 
-    stockpup_folder, testing_folder, list_filetype, os, pd,
+# from haystack_sectors import Sectors
+from src.utilities import (
+    analysis_folder, edgar_folder, processed_folder, sectors_folder,
+    stockpup_folder, testing_folder, list_filetype, os,
 )
 
 folder = f"{testing_folder}{processed_folder}{analysis_folder}"
@@ -45,7 +45,7 @@ class TestDataFrames(unittest.TestCase):
             sorted(stockpup_sectors.sectors_df.columns)
         )
         self.assertEqual(
-            sorted(edgar_sectors.sectors_df.columns), 
+            sorted(edgar_sectors.sectors_df.columns),
             ["COMPANY", "SECTOR_NAME", "SECTOR_SYMBOL"]
         )
 
@@ -70,7 +70,7 @@ class TestPrices(unittest.TestCase):
 
     def test_prices_is_a_series_with_the_same_index_as_combined_df(self):
         self.assertEqual(
-            sorted(self.edgar_prices.index), 
+            sorted(self.edgar_prices.index),
             sorted(edgar_sectors.symbols.index)
         )
         self.assertEqual(
@@ -119,7 +119,7 @@ class TestAveragePriceScore(unittest.TestCase):
         self.assertIs(
             type(stockpup_sectors.symbols.AVERAGE_PRICE_RATIOS), pd.Series
         )
-    
+
 @unittest.skip
 class TestReports(unittest.TestCase):
 

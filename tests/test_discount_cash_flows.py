@@ -1,5 +1,5 @@
 import unittest
-from stock import get_discount_cash_flow_value
+from src.stock import get_discount_cash_flow_value
 from numpy import nan
 from numpy.testing import assert_equal
 
@@ -12,7 +12,7 @@ class TestGetDiscountCashFlowValue(unittest.TestCase):
                 get_discount_cash_flow_value(
                     [1, 1.5, 1.2, 1.1]
                 ),2
-            ), 
+            ),
             4.58
         )
 
@@ -21,11 +21,11 @@ class TestGetDiscountCashFlowValue(unittest.TestCase):
             round(
                 get_discount_cash_flow_value(
                     [
-                        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, 0., 0., 
-                        -0.47, -0.47, -0.235, -7.43670886, 
+                        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, 0., 0.,
+                        -0.47, -0.47, -0.235, -7.43670886,
                         -4.23944783
                     ]
-                ), 
+                ),
                 2
             ),
             nan

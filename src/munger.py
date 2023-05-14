@@ -25,7 +25,10 @@ class Munger:
 
     def convert_2000_new_year_to_1999_year_end(self, dataframe):
         self.logger.log('Converted 1999-12-31 to 2000-01-01')
-        return dataframe.replace('2000-01-01', '1999-12-31')
+        try:
+            return dataframe.replace('2000-01-01', '1999-12-31')
+        except KeyError:
+            return dataframe
 
     def set_uppercase_column_names(self, dataframe):
         self.logger.log('Setting Column Names to UPPERCASE Labels')

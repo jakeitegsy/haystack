@@ -2,7 +2,7 @@ import unittest
 import pandas
 import numpy
 
-from stock import get_ratio
+from src.stock import get_ratio
 
 def create_series(elements):
     return pandas.Series(
@@ -83,11 +83,11 @@ class TestGetRatio(unittest.TestCase):
 
     def test_get_ratio_returns_negative_ratio_series_when_numerator_is_less_than_zero_and_y_is_greater_than_zero(self):
         pandas.testing.assert_series_equal(
-            get_ratio(self.negative_series(), self.positive_series()), 
+            get_ratio(self.negative_series(), self.positive_series()),
             self.negative_identity_series()
         )
         pandas.testing.assert_series_equal(
-            get_ratio(self.negative_series(), self.positive_two_series()), 
+            get_ratio(self.negative_series(), self.positive_two_series()),
             self.negative_floats_series()
         )
 
@@ -105,11 +105,11 @@ class TestGetRatio(unittest.TestCase):
 
     def test_get_ratio_returns_ratio_series_when_both_numerator_and_denominator_are_positive(self):
         pandas.testing.assert_series_equal(
-            get_ratio(self.positive_series(), self.positive_series()),     
+            get_ratio(self.positive_series(), self.positive_series()),
             -(self.negative_identity_series())
         )
         pandas.testing.assert_series_equal(
-            get_ratio(self.positive_series(), self.positive_two_series()), 
+            get_ratio(self.positive_series(), self.positive_two_series()),
             -(self.negative_floats_series())
         )
 

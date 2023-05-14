@@ -2,22 +2,21 @@ import datetime
 import json
 import yfinance as yahoo_finance
 
+from . import utilities
 from scipy.stats import hmean
-from haystack_utilities import (
-    ANALYSIS_FOLDER, INDUSTRY_FOLDER, PROCESSED_FOLDER, 
-    SECTORS_FOLDER,  STOCKPUP_FOLDER,
-    pd, list_filetype, os, test_folder, makedir
+from .utilities import (
+    list_filetype, os, test_folder, makedir
 )
 
 
 class Analyst:
 
-    def __init__(self, 
-        ticker=None, 
-        filename=None, 
+    def __init__(self,
+        ticker=None,
+        filename=None,
         to_folder=None,
-        from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}", 
-        discount_rate=0.0316, 
+        from_folder=f"{utilities.processed_folder()}{utilities.stockpup_folder()}",
+        discount_rate=0.0316,
         source="STOCKPUP"
     ):
         self.ticker, self.filename = self.get_ticker_and_filename(
@@ -34,7 +33,7 @@ class Analyst:
     def aggregate(self, df):
         """returns dataframe with yearly summary for each column"""
         Q4 = lambda x: x[0]
-        try: 
+        try:
             return df.groupby(level=0).agg({
                 "CURRENT_ASSETS": self.fourth_quarter(), # Q4,
                 "CURRENT_LIABILITIES": Q4,
@@ -104,14 +103,14 @@ class Analyst:
         return self.transform_dict(diffs_dict)
 
     def get_discount_cash_flow_value(self, values):
-        return sum([(values[i] / ((1 + self.discount_rate) ** i)) 
+        return sum([(values[i] / ((1 + self.discount_rate) ** i))
                     for i in range(len(values))])
 
     def calc_growth(self, df, using="simple"):
         "Return Simple or Compound Growth Rate"
-        if using == "compound":            
+        if using == "compound":
             try:
-                avg = (((df.iloc[-1] / df.iloc[0]) 
+                avg = (((df.iloc[-1] / df.iloc[0])
                         ** (1 / (df.shape[0] - 1))) - 1)
             except ZeroDivisionError:
                 avg = df.pct_change(axis=0)
@@ -149,7 +148,7 @@ class Analyst:
             net_dict.update({
                 "NET_EQUITY": data["NET_ASSETS"] - data["NET_LIABILITIES"],
                 "NET_INVESTED_CAP": (
-                     data["NET_DEBT"] + data["NET_PREFERRED"] + 
+                     data["NET_DEBT"] + data["NET_PREFERRED"] +
                      data["NET_NONCONTROLLING"] + data["NET_EQUITY"]
                  ),
                 "NET_LIABILITIES": data["NET_LIABILITIES"],
@@ -157,10 +156,10 @@ class Analyst:
                     data["NET_NONCONTROLLING"] + data["NET_PREFERRED"]
                 ),
                 "NET_SHARES": data["NET_SHARES"],
-                "NET_FCF": (data["NET_CASH_OP"] - 
-                            data["CAPITAL_EXPENDITURES"]),  
+                "NET_FCF": (data["NET_CASH_OP"] -
+                            data["CAPITAL_EXPENDITURES"]),
                 "NET_TANGIBLE": (
-                    data["NET_ASSETS"] 
+                    data["NET_ASSETS"]
                  - (data["NET_LIABILITIES"] + data["NET_GOODWILL"])
                 ),
             })
@@ -176,12 +175,12 @@ class Analyst:
                     data["NET_INCOME"] / data["PER_SHARE_EARNINGS_DILUTED"]
                 ),
                 "NET_TANGIBLE": (
-                    data["NET_ASSETS"] 
+                    data["NET_ASSETS"]
                   - net_dict["NET_LIABILITIES"] + data["NET_GOODWILL"]
                 ),
                 "NET_NONCONTROLLING": 0.0,
             })
-        
+
         net_dict["NET_DIVIDENDS"] = (
             data["PER_SHARE_DIVIDENDS"] * net_dict["NET_SHARES"]
         )
@@ -285,10 +284,10 @@ class Analyst:
             "RATIO_TANGIBLE_LIABILITIES": tangible / liabilities,
             "RATIO_TANGIBLE_DEBT": ratio(tangible, debt),
         }
-        
+
         return self.transform_dict(ratios_dict)
 
-    def combine_files(self, folder, ext="csv", header=None, 
+    def combine_files(self, folder, ext="csv", header=None,
                       axis=0, file_col="Symbol", ignore_index=False):
         "Returns dataframe of csv files in folder"
         file_col = file_col.upper()
@@ -357,12 +356,12 @@ class Analyst:
             tickers = df.index
         except AttributeError:
             tickers = symbols
-        
+
         today = datetime.date.today()
         prices_today = f"prices/{str(today)}_current_prices.pkl"
         try:
             current_prices = pd.read_pickle(prices_today)
-        except FileNotFoundError:            
+        except FileNotFoundError:
             try:
                 prices = self.yahoo_finance_download(
                     tickers=tickers, start=today,
@@ -417,7 +416,7 @@ class Analyst:
             # regular ratio
             if x > 0 and y > 0: return x / y
 
-    def get_ticker_and_filename(self, filename=None, ticker=None, 
+    def get_ticker_and_filename(self, filename=None, ticker=None,
                                 folder=None):
         if filename is not None:
             ticker = os.path.split(filename)[1].split(".")[0]
@@ -458,7 +457,7 @@ class Analyst:
         stockpup = {
             "ASSETS": "NET_ASSETS",
             "BOOK VALUE OF EQUITY PER SHARE": "PER_SHARE_BOOK",
-            "CASH AT END OF PERIOD": "NET_CASH", 
+            "CASH AT END OF PERIOD": "NET_CASH",
             "CASH FROM FINANCING ACTIVITIES": "NET_CASH_FIN",
             "CASH FROM INVESTING ACTIVITIES": "NET_CASH_INV",
             "CASH FROM OPERATING ACTIVITIES": "NET_CASH_OP",
@@ -471,13 +470,13 @@ class Analyst:
             "EARNINGS AVAILABLE FOR COMMON STOCKHOLDERS":"NET_INCOME",
             "EPS BASIC": "PER_SHARE_EARNINGS_BASIC",
             "EPS DILUTED": "PER_SHARE_EARNINGS_DILUTED",
-            "GOODWILL & INTANGIBLES": "NET_GOODWILL", 
+            "GOODWILL & INTANGIBLES": "NET_GOODWILL",
             "LIABILITIES": "NET_LIABILITIES",
-            "LONG-TERM DEBT": "NET_DEBT", 
+            "LONG-TERM DEBT": "NET_DEBT",
             "NON-CONTROLLING INTEREST": "NET_NONCONTROLLING",
             "PREFERRED EQUITY": "NET_PREFERRED",
             "REVENUE": "NET_REVENUE",
-            "SHAREHOLDERS EQUITY": "NET_EQUITY", 
+            "SHAREHOLDERS EQUITY": "NET_EQUITY",
             "SHARES": "NET_SHARES_NO_SPLIT",
             "SHARES SPLIT ADJUSTED": "NET_SHARES",
         }
@@ -524,7 +523,7 @@ class Analyst:
 
         score = sum(
             [safety_score, returns_score, growth_score, price_score]
-        ) 
+        )
         return score / max(score)
 
     def score_price_ratios(self, df):
@@ -561,7 +560,7 @@ class Analyst:
             data = df.rename(str.upper, axis="columns")
         return data
 
-    def write_report(self, df=None, report='', to_file=None, 
+    def write_report(self, df=None, report='', to_file=None,
                      to_folder=None):
         makedir(to_folder)
         filename = f'{to_folder}{to_file}.csv'
@@ -575,18 +574,18 @@ class Analyst:
         except FileNotFoundError:
             self.write_report(df=df, report=report,
                               to_file=to_file, to_folder=to_folder)
-        
+
         print(f"writing {to_file}'s {report.lower()} "
               f"report to '{to_folder}'")
 
 
 class AssignSector(Analyst):
     """"""
-    
+
     def __init__(self, ticker=None, filename=None,
-                 to_folder=f"{ANALYSIS_FOLDER}{SECTORS_FOLDER}"):
-        super().__init__(ticker=ticker, filename=filename, 
-                         to_folder=to_folder, from_folder=SECTORS_FOLDER)
+                 to_folder=f"{utilities.analysis_folder()}{utilities.sectors_folder()}"):
+        super().__init__(ticker=ticker, filename=filename,
+                         to_folder=to_folder, from_folder=utilities.sectors_folder())
         self.folder = to_folder
         self.sectors = {
             "XLY": "CONSUMER_DISCRETIONARY",
@@ -612,25 +611,25 @@ class AssignSector(Analyst):
 
         self.write_report(
             df=self.symbols, report="Sectors",
-            to_file=self.ticker, to_folder=self.folder, 
+            to_file=self.ticker, to_folder=self.folder,
         )
 
 
 class AssignIndustry(Analyst):
-    
+
     def __init__(self, ticker=None, filename=None,
-                 to_folder=f"{ANALYSIS_FOLDER}{INDUSTRY_FOLDER}"):
-        super().__init__(ticker=ticker, filename=filename, 
-                         to_folder=to_folder, 
-                         from_folder=INDUSTRY_FOLDER)
+                 to_folder=f"{utilities.analysis_folder()}{utilities.industry_folder()}"):
+        super().__init__(ticker=ticker, filename=filename,
+                         to_folder=to_folder,
+                         from_folder=utilities.industry_folder())
         self.folder = to_folder
         self.symbols = pd.read_csv(
             self.filename,
-            usecols=["Symbol", "Name", "Sector", "Industry"], 
+            usecols=["Symbol", "Name", "Sector", "Industry"],
             index_col="Symbol"
         )
         self.symbols = self.symbols.rename(columns={
-            "Symbol": "SYMBOL", 
+            "Symbol": "SYMBOL",
             "Name": "COMPANY",
             "Sector": "SECTOR",
             "Industry": "INDUSTRY",
@@ -638,5 +637,5 @@ class AssignIndustry(Analyst):
 
         self.write_report(
             df=self.symbols, report="Industry",
-            to_file=self.ticker, to_folder=self.folder, 
+            to_file=self.ticker, to_folder=self.folder,
         )

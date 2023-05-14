@@ -94,4 +94,3 @@ class TestMungerWithStockPupData(jadecobra.tester.TestCase):
                 'CURRENT RATIO'
             ])
         )
-        self.publish()

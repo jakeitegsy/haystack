@@ -18,9 +18,6 @@ class TestWriteReports(jadecobra.tester.TestCase):
             to_file="test_report",
             to_folder=src.utilities.testing_folder('report'),
         )
-        self.assertTrue(
-            os.path.exists(src.utilities.testing_folder('report/test_report.csv'))
-        )
         pandas.testing.assert_frame_equal(
             pandas.read_csv(src.utilities.testing_folder('report/test_report.csv'), index_col=0),
             data_frame

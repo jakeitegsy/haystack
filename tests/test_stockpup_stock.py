@@ -5,7 +5,6 @@ import re
 import src.stock
 import unittest
 
-from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
@@ -36,7 +35,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_raw_data_columns(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_raw_data().columns,
             Index([
                 'Shares',
@@ -84,7 +83,7 @@ class TestStockPup(jadecobra.tester.TestCase):
 
     @unittest.skip
     def test_set_index_creates_multi_index_of_years_and_quarters(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.set_index(STOCK.get_raw_data()).index,
             MultiIndex.from_tuples([
                 (2018, 1),
@@ -249,25 +248,25 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_net_values(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_net_values().columns,
             Index(self.net_columns())
         )
 
     def test_aggregate_keeps_same_columns_as_net_calculations(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_aggregated_years().columns,
             STOCK.get_net_values().columns
         )
 
     def test_moving_averages_keep_same_columns_as_net_calculations(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.moving_averages.columns,
             STOCK.get_net_values().columns
         )
 
     def test_get_moving_average_differences(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_moving_average_differences().columns,
             Index([
                 f'DIFF_{column}' for column in (
@@ -292,7 +291,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_growth_rates(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_moving_average_growth_rates().index,
             Index([
                 f'GROWTH_{column}'
@@ -301,7 +300,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_moving_average_ratios(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_moving_average_ratios().columns,
             Index([
                 f'RATIO_{column}' for column in (
@@ -352,7 +351,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_moving_averages_per_share(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_moving_averages_per_share().columns,
             Index([
                 f'PER_SHARE_{column}' for column in (
@@ -386,31 +385,31 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_average_per_share_averages(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_average_per_share_averages().index,
             STOCK.get_moving_averages_per_share().columns
         )
 
     def test_get_average_moving_averages(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_average_moving_averages().index,
             STOCK.moving_averages.columns
         )
 
     def test_average_moving_average_differences(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_moving_average_differences().columns,
             STOCK.get_average_moving_average_differences().index
         )
 
     def test_average_moving_average_ratios(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_average_moving_average_ratios().index,
             STOCK.get_moving_average_ratios().columns
         )
 
     def test_average_per_share_differences(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_average_per_share_differences().index,
             Index([
                 f'PER_SHARE_DIFF_{column}' for column in (
@@ -511,7 +510,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_get_averages(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_averages().index,
             Index([
                 'AVERAGE_GROWTH',
@@ -525,7 +524,7 @@ class TestStockPup(jadecobra.tester.TestCase):
         )
 
     def test_stock_summary(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             STOCK.get_summary().index,
             concat([
                 STOCK.get_averages(),

@@ -24,7 +24,6 @@ class TestBenchmark(jadecobra.tester.TestCase):
                 f'{self.to_folder()}{test_job.__name__}_benchmark.txt'
             )
         )
-        self.publish()
 
     def test_benchmark_writes_report_to_given_folder_with_given_name(self):
         benchmark(

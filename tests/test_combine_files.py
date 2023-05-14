@@ -1,8 +1,8 @@
 import unittest
 #import http
 
-from haystack_analyst import Analyst
-from utilities import os, pd, janitor, testing_folder, stockpup_folder
+from src.haystack_analyst import Analyst
+from src.utilities import os, pd, janitor, testing_folder, stockpup_folder
 
 @unittest.skip
 class TestCombineCSV(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestCombineCSV(unittest.TestCase):
         self.assertIs(combined, None)
 
     def test_combine_csv_returns_a_dataframe_when_folder_contains_csv_with_multiple_columns(self):
-        combined = self.combine(folder=stockpup_folder, 
+        combined = self.combine(folder=stockpup_folder,
                                 file_col="SECTOR")
         self.assertIs(type(combined), pd.DataFrame)
 

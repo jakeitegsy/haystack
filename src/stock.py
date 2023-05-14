@@ -433,7 +433,7 @@ class Stock:
     def to_csv(self, output_folder):
         self.logger.log(f'Writing {self.ticker} summary to csv')
         write_report(
-            dataframe=self.get_summary(),
+            data_frame=self.get_summary(),
             report='summary',
             to_file=self.ticker,
             to_folder=output_folder,
@@ -716,7 +716,7 @@ class AssignSector(Stock):
         self.symbols["SECTOR"] = self.sectors[self.ticker]
 
         write_report(
-            dataframe=self.symbols, report="Sectors",
+            data_frame=self.symbols, report="Sectors",
             to_file=self.ticker, to_folder=self.folder,
         )
 
@@ -742,6 +742,6 @@ class AssignIndustry(Stock):
         })
 
         write_report(
-            dataframe=self.symbols, report="Industry",
+            data_frame=self.symbols, report="Industry",
             to_file=self.ticker, to_folder=self.folder,
         )

@@ -5,9 +5,9 @@ import yfinance as yahoo_finance
 from datetime import datetime
 from itertools import product
 from re import search
-from logger import Logger
-from munger import Munger
-from ratios import get_ratio
+from src.logger import Logger
+from src.munger import Munger
+from src.ratios import get_ratio
 from pandas.errors import EmptyDataError
 from pandas.api.types import is_object_dtype
 from numpy import inf, nan, median
@@ -16,8 +16,8 @@ from pandas import (
     DataFrame, Series, MultiIndex, Index, read_csv, to_numeric,
     concat
 )
-from utilities import (
-    analysis_folder, industry_folder, processed_folder, 
+from src.utilities import (
+    analysis_folder, industry_folder, processed_folder,
     sectors_folder,  stockpup_folder,
     write_report,
 )
@@ -32,10 +32,10 @@ def get_discount_cash_flow_value(values, discount_rate=0.0316):
 
 class Stock:
 
-    def __init__(self, 
-        ticker=None, 
-        filename=None, 
-        discount_rate=0.0316, 
+    def __init__(self,
+        ticker=None,
+        filename=None,
+        discount_rate=0.0316,
         source="STOCKPUP"
     ):
         self.discount_rate = discount_rate
@@ -69,8 +69,8 @@ class Stock:
 
     def get_net_tangible(self, dataframe):
         return (
-            dataframe['NET_ASSETS'] 
-          - self.get_net_liabilities(dataframe) 
+            dataframe['NET_ASSETS']
+          - self.get_net_liabilities(dataframe)
           + dataframe['NET_GOODWILL']
         )
 
@@ -152,7 +152,7 @@ class Stock:
             "DIFF_INCOME_DEBT": data['NET_INCOME']  - data['NET_DEBT'],
             "DIFF_INCOME_LIABILITIES": data['NET_INCOME']  - data['NET_LIABILITIES'],
             "DIFF_TANGIBLE_DEBT": data['NET_TANGIBLE']  - data['NET_DEBT'],
-            "DIFF_TANGIBLE_LIABILITIES": data['NET_TANGIBLE']  - data['NET_LIABILITIES'],  
+            "DIFF_TANGIBLE_LIABILITIES": data['NET_TANGIBLE']  - data['NET_LIABILITIES'],
         }
 
     def get_moving_average_differences(self):
@@ -201,7 +201,7 @@ class Stock:
     def get_median_growth_rate(self):
         self.logger.log('Calculating Median Growth Rates')
         return median([
-            self.get_moving_average_growth_rates()[f'GROWTH_NET_{value}'] 
+            self.get_moving_average_growth_rates()[f'GROWTH_NET_{value}']
             for value in self.financial_ratios()
         ])
 
@@ -209,7 +209,7 @@ class Stock:
         self.logger.log('Calculating Median Returns')
         moving_average_ratios = self.get_moving_average_ratios()
         return median([
-            moving_average_ratios[f'RATIO_{value}'] 
+            moving_average_ratios[f'RATIO_{value}']
             for value in (
                 'INCOME_ASSETS',
                 'INCOME_CASH',
@@ -240,13 +240,13 @@ class Stock:
 
     def resources(self):
         return (
-            'ASSETS', 
-            'CASH', 
-            'CURRENT_ASSETS', 
-            'EQUITY', 
-            'FCF', 
+            'ASSETS',
+            'CASH',
+            'CURRENT_ASSETS',
+            'EQUITY',
+            'FCF',
             'FCF_SHY',
-            'INCOME', 
+            'INCOME',
             'TANGIBLE'
         )
 
@@ -287,10 +287,10 @@ class Stock:
             'DATA_END': self.get_data_end(),
             'DATA_START': self.get_data_start(),
             'PER_SHARE_DCF_FORWARD': (
-                self.get_average_per_share_averages()['PER_SHARE_NET_FCF'] 
+                self.get_average_per_share_averages()['PER_SHARE_NET_FCF']
               / self.discount_rate),
             'PER_SHARE_DCF_SHY_FORWARD': (
-                self.get_average_per_share_averages()['PER_SHARE_NET_FCF_SHY'] 
+                self.get_average_per_share_averages()['PER_SHARE_NET_FCF_SHY']
               / self.discount_rate
             )
         })
@@ -299,7 +299,7 @@ class Stock:
         try:
             return (
                 (
-                    (dataframe.iloc[-1] / dataframe.iloc[0]) 
+                    (dataframe.iloc[-1] / dataframe.iloc[0])
                  ** (1.0 / (dataframe.shape[0] - 1))
                 ) - 1
             )
@@ -337,11 +337,11 @@ class Stock:
             )
         )
         result['PER_SHARE_DCF_HISTORIC'] = self.get_dcf_valuation(
-            dataframe=result, 
+            dataframe=result,
             key='PER_SHARE_NET_FCF'
         )
         result['PER_SHARE_DCF_SHY_HISTORIC'] = self.get_dcf_valuation(
-            dataframe=result, 
+            dataframe=result,
             key='PER_SHARE_NET_FCF_SHY'
         )
         return result
@@ -393,7 +393,7 @@ class Stock:
             "RATIO_INCOME_TANGIBLE": get_ratio(data['NET_INCOME'], data['NET_TANGIBLE']),
             "RATIO_TANGIBLE_ASSETS": data['NET_TANGIBLE'] / data['NET_ASSETS'],
             "RATIO_TANGIBLE_LIABILITIES": data['NET_TANGIBLE'] / data['NET_LIABILITIES'],
-            "RATIO_TANGIBLE_DEBT": get_ratio(data['NET_TANGIBLE'], data['NET_DEBT']),        
+            "RATIO_TANGIBLE_DEBT": get_ratio(data['NET_TANGIBLE'], data['NET_DEBT']),
         }
 
     def get_moving_average_ratios(self):
@@ -446,7 +446,7 @@ class StockPup(Stock):
         self.ticker = ticker if ticker else self.get_ticker(filename)
         self.filename = filename if filename else self.get_filename(ticker)
         super().__init__(ticker=self.ticker, filename=self.filename)
-        self.get_moving_averages() 
+        self.get_moving_averages()
 
     def get_filename(self, ticker):
         return f'{ticker}_quarterly_financial_data.csv'
@@ -477,7 +477,7 @@ class StockPup(Stock):
         return {
             "ASSETS": "NET_ASSETS",
             "BOOK VALUE OF EQUITY PER SHARE": "PER_SHARE_BOOK",
-            "CASH AT END OF PERIOD": "NET_CASH", 
+            "CASH AT END OF PERIOD": "NET_CASH",
             "CASH FROM FINANCING ACTIVITIES": "NET_CASH_FIN",
             "CASH FROM INVESTING ACTIVITIES": "NET_CASH_INVESTED",
             "CASH FROM OPERATING ACTIVITIES": "NET_CASH_OP",
@@ -490,13 +490,13 @@ class StockPup(Stock):
             "EARNINGS AVAILABLE FOR COMMON STOCKHOLDERS":"NET_INCOME",
             "EPS BASIC": "PER_SHARE_EARNINGS_BASIC",
             "EPS DILUTED": "PER_SHARE_EARNINGS_DILUTED",
-            "GOODWILL & INTANGIBLES": "NET_GOODWILL", 
+            "GOODWILL & INTANGIBLES": "NET_GOODWILL",
             "LIABILITIES": "NET_LIABILITIES",
-            "LONG-TERM DEBT": "NET_DEBT", 
+            "LONG-TERM DEBT": "NET_DEBT",
             "NON-CONTROLLING INTEREST": "NET_NONCONTROLLING",
             "PREFERRED EQUITY": "NET_PREFERRED",
             "REVENUE": "NET_REVENUE",
-            "SHAREHOLDERS EQUITY": "NET_EQUITY", 
+            "SHAREHOLDERS EQUITY": "NET_EQUITY",
             "SHARES": "NET_SHARES_NO_SPLIT",
             "SHARES SPLIT ADJUSTED": "NET_SHARES",
         }
@@ -510,13 +510,13 @@ class StockPup(Stock):
     def get_incomplete_years(self, dataframe):
         return [
             year for year in dataframe.index.levels[0]
-            if len(dataframe.loc[year]) != 4 
+            if len(dataframe.loc[year]) != 4
         ]
 
     def get_annual_data(self, dataframe):
         result = self.set_index(dataframe)
         return result.drop(
-            self.get_incomplete_years(result), 
+            self.get_incomplete_years(result),
             axis=0, level=0
         )
 
@@ -528,7 +528,7 @@ class StockPup(Stock):
 
     def get_net_invested_capital(self, dataframe):
         return (
-             dataframe["NET_DEBT"] + dataframe["NET_PREFERRED"] + 
+             dataframe["NET_DEBT"] + dataframe["NET_PREFERRED"] +
              self.get_net_noncontrolling(dataframe) + dataframe["NET_EQUITY"]
         )
 
@@ -586,7 +586,7 @@ class Edgar(Stock):
         self.ticker = ticker if ticker else self.get_ticker(filename)
         self.filename = filename if filename else self.get_filename(ticker)
         super().__init__(ticker=self.ticker, filename=self.filename)
-        self.get_moving_averages() 
+        self.get_moving_averages()
 
     def get_filename(self, ticker):
         return f'{ticker}.csv'
@@ -631,7 +631,7 @@ class Edgar(Stock):
             "INTANGIBLE": "NET_INTANGIBLE",
             "REVENUES": "NET_REVENUE",
             "EQUITY": "NET_EQUITY",
-        }    
+        }
 
     def doc_type(self):
         return 'doc_type'
@@ -685,12 +685,12 @@ class Edgar(Stock):
 
 
 class AssignSector(Stock):
-    
+
     def __init__(
         self, ticker=None, filename=None,
         to_folder=analysis_folder(sectors_folder())
     ):
-        super().__init__(ticker=ticker, filename=filename, 
+        super().__init__(ticker=ticker, filename=filename,
                          to_folder=to_folder, from_folder=sectors_folder)
         self.folder = to_folder
         self.sectors = {
@@ -717,25 +717,25 @@ class AssignSector(Stock):
 
         write_report(
             dataframe=self.symbols, report="Sectors",
-            to_file=self.ticker, to_folder=self.folder, 
+            to_file=self.ticker, to_folder=self.folder,
         )
 
 
 class AssignIndustry(Stock):
-    
+
     def __init__(self, ticker=None, filename=None,
                  to_folder=f"{analysis_folder}{industry_folder}"):
-        super().__init__(ticker=ticker, filename=filename, 
-                         to_folder=to_folder, 
+        super().__init__(ticker=ticker, filename=filename,
+                         to_folder=to_folder,
                          from_folder=industry_folder)
         self.folder = to_folder
         self.symbols = pd.read_csv(
             self.filename,
-            usecols=["Symbol", "Name", "Sector", "Industry"], 
+            usecols=["Symbol", "Name", "Sector", "Industry"],
             index_col="Symbol"
         )
         self.symbols = self.symbols.rename(columns={
-            "Symbol": "SYMBOL", 
+            "Symbol": "SYMBOL",
             "Name": "COMPANY",
             "Sector": "SECTOR",
             "Industry": "INDUSTRY",
@@ -743,5 +743,5 @@ class AssignIndustry(Stock):
 
         write_report(
             dataframe=self.symbols, report="Industry",
-            to_file=self.ticker, to_folder=self.folder, 
+            to_file=self.ticker, to_folder=self.folder,
         )

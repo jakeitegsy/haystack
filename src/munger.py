@@ -1,10 +1,10 @@
-from logger import Logger
+from src.logger import Logger
 from numpy import inf, nan
 
 
 class Munger:
 
-    def __init__(self, 
+    def __init__(self,
         ticker=None, raw_data=None, mappings=None, filename=None
     ):
         self.logger = Logger(ticker)

@@ -1,9 +1,11 @@
-import unittest
+import os
+os.system()
+import jadecobra.tester
 
-from stock import AssignSector
+from src.stock import AssignSector
 from pandas import DataFrame
 from os import path
-from utilities import (
+from src.utilities import (
     processed_folder, sectors_folder, testing_folder, analysis_folder, random_ticker
 )
 
@@ -53,10 +55,10 @@ class TestSectors(unittest.TestCase):
     def test_sector_XLU_returns_utilities(self):
         self.assertEqual(self.sector.sectors['XLU'], 'UTILITIES')
     """
-    
+
 @unittest.skip
 class TestAssignSectors(TestSectors):
-    
+
     def setUp(self):
         super().setUp()
         self.symbols = self.sector.symbols

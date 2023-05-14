@@ -24,7 +24,7 @@ class TestWriteReports(jadecobra.tester.TestCase):
             pandas.read_csv(testing_folder('report/test_report.csv')),
             data_frame
         )
+        self.publish()
 
     def test_write_report_returns_a_message_when_df_is_none(self):
         self.assertEqual(src.utilities.write_report(), "Invalid operation for NoneType")
-        self.publish()

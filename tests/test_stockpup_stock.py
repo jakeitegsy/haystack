@@ -5,7 +5,7 @@ import re
 import src.stock
 import unittest
 
-from pandas import Index, MultiIndex, concat
+# from pandas import Index, MultiIndex, concat
 
 STOCK = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
 

@@ -1,17 +1,19 @@
-import unittest
+import jadecobra.tester
+import pandas
+import src.stock
+import src.munger
 
-from src.munger import Munger
-from src.stock import Stock
+
 from pandas.testing import assert_index_equal
-from pandas import Index
+# from pandas import Index
 
 
-class TestMungerWithStockPupData(unittest.TestCase):
+class TestMungerWithStockPupData(jadecobra.tester.TestCase):
 
-    stockpup = Stock(source='STOCKPUP', ticker='BAC').get_stock()
+    stockpup = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
 
     def munger(self):
-        return Munger(
+        return src.munger.Munger(
             ticker='BAC',
             raw_data=self.stockpup.get_raw_data(),
             filename=self.stockpup.filename,
@@ -53,7 +55,7 @@ class TestMungerWithStockPupData(unittest.TestCase):
                     )
                     .columns
             ),
-            Index([
+            pandas.Index([
                 'NET_SHARES_NO_SPLIT',
                 'NET_SHARES',
                 'SPLIT FACTOR',
@@ -96,3 +98,4 @@ class TestMungerWithStockPupData(unittest.TestCase):
                 'CURRENT RATIO'
             ])
         )
+        self.publish()

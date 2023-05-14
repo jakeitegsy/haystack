@@ -5,7 +5,6 @@ import re
 import src.stock
 import unittest
 
-from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
 STOCK = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
@@ -215,7 +214,7 @@ class TestStockPup(jadecobra.tester.TestCase):
             (
                 STOCK
                     .set_numeric_datatypes(STOCK.get_raw_data())
-                    .dtypes.apply(is_numeric_dtype)
+                    .dtypes.apply(pandas.api.types.is_numeric_dtype)
                     .all()
             )
         )

@@ -4,10 +4,6 @@ import src.stock
 import src.munger
 
 
-from pandas.testing import assert_index_equal
-# from pandas import Index
-
-
 class TestMungerWithStockPupData(jadecobra.tester.TestCase):
 
     stockpup = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
@@ -31,7 +27,7 @@ class TestMungerWithStockPupData(jadecobra.tester.TestCase):
             return
 
     def test_set_uppercase_column_names(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             (
                 self.munger()
                     .set_uppercase_column_names(
@@ -46,7 +42,7 @@ class TestMungerWithStockPupData(jadecobra.tester.TestCase):
         )
 
     def test_rename_columns(self):
-        assert_index_equal(
+        pandas.testing.assert_index_equal(
             (
                 self.munger()
                     .rename_columns(

@@ -5,32 +5,31 @@ import re
 import src.stock
 import unittest
 
-from src.stock import Stock
 from numpy import median
 from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
-stock = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
+STOCK = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
 
 
-class TestStockPup(unittest.TestCase):
+class TestStockPup(jadecobra.tester.TestCase):
 
     def test_source_folder_for_stockpup_data(self):
         self.assertEqual(
-            stock.source_folder(),
+            STOCK.source_folder(),
             'stockpup_data'
         )
 
     def test_stockpup_filename_when_ticker_provided(self):
         self.assertEqual(
-            Stock(ticker='BAC').get_stock().filename,
+            src.stock.Stock(ticker='BAC').get_stock().filename,
             'BAC_quarterly_financial_data.csv'
         )
 
     def test_ticker_when_filename_is_given(self):
         self.assertEqual(
-            Stock(
+            src.stock.Stock(
                 source='STOCKPUP',
                 filename='GOOG_quarterly_financial_data.csv'
             ).get_stock().ticker,
@@ -39,7 +38,7 @@ class TestStockPup(unittest.TestCase):
 
     def test_raw_data_columns(self):
         assert_index_equal(
-            stock.get_raw_data().columns,
+            STOCK.get_raw_data().columns,
             Index([
                 'Shares',
                 'Shares split adjusted',
@@ -87,7 +86,7 @@ class TestStockPup(unittest.TestCase):
     @unittest.skip
     def test_set_index_creates_multi_index_of_years_and_quarters(self):
         assert_index_equal(
-            stock.set_index(stock.get_raw_data()).index,
+            STOCK.set_index(STOCK.get_raw_data()).index,
             MultiIndex.from_tuples([
                 (2018, 1),
                 (2017, 4),
@@ -191,7 +190,7 @@ class TestStockPup(unittest.TestCase):
         )
 
     def annual_data(self):
-        return stock.get_annual_data(stock.get_raw_data())
+        return STOCK.get_annual_data(STOCK.get_raw_data())
 
     def test_get_annual_data_drops_years_without_4_quarters(self):
         for year in self.annual_data().index.levels[0]:
@@ -204,9 +203,9 @@ class TestStockPup(unittest.TestCase):
     def test_replace_null_values_with_zero(self):
         self.assertFalse(
             (
-                stock
+                STOCK
                     .replace_null_values_with_zero(
-                        stock.get_raw_data()
+                        STOCK.get_raw_data()
                     )
                 .isna()
                 .values.any()
@@ -216,8 +215,8 @@ class TestStockPup(unittest.TestCase):
     def test_set_numeric_datatypes(self):
         self.assertTrue(
             (
-                stock
-                    .set_numeric_datatypes(stock.get_raw_data())
+                STOCK
+                    .set_numeric_datatypes(STOCK.get_raw_data())
                     .dtypes.apply(is_numeric_dtype)
                     .all()
             )
@@ -252,25 +251,25 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_net_values(self):
         assert_index_equal(
-            stock.get_net_values().columns,
+            STOCK.get_net_values().columns,
             Index(self.net_columns())
         )
 
     def test_aggregate_keeps_same_columns_as_net_calculations(self):
         assert_index_equal(
-            stock.get_aggregated_years().columns,
-            stock.get_net_values().columns
+            STOCK.get_aggregated_years().columns,
+            STOCK.get_net_values().columns
         )
 
     def test_moving_averages_keep_same_columns_as_net_calculations(self):
         assert_index_equal(
-            stock.moving_averages.columns,
-            stock.get_net_values().columns
+            STOCK.moving_averages.columns,
+            STOCK.get_net_values().columns
         )
 
     def test_get_moving_average_differences(self):
         assert_index_equal(
-            stock.get_moving_average_differences().columns,
+            STOCK.get_moving_average_differences().columns,
             Index([
                 f'DIFF_{column}' for column in (
                     'ASSETS_DEBT',
@@ -295,7 +294,7 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_growth_rates(self):
         assert_index_equal(
-            stock.get_moving_average_growth_rates().index,
+            STOCK.get_moving_average_growth_rates().index,
             Index([
                 f'GROWTH_{column}'
                 for column in self.net_columns()
@@ -304,7 +303,7 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_moving_average_ratios(self):
         assert_index_equal(
-            stock.get_moving_average_ratios().columns,
+            STOCK.get_moving_average_ratios().columns,
             Index([
                 f'RATIO_{column}' for column in (
                     'CASH_ASSETS',
@@ -355,7 +354,7 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_moving_averages_per_share(self):
         assert_index_equal(
-            stock.get_moving_averages_per_share().columns,
+            STOCK.get_moving_averages_per_share().columns,
             Index([
                 f'PER_SHARE_{column}' for column in (
                     'CURRENT_ASSETS',
@@ -389,31 +388,31 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_average_per_share_averages(self):
         assert_index_equal(
-            stock.get_average_per_share_averages().index,
-            stock.get_moving_averages_per_share().columns
+            STOCK.get_average_per_share_averages().index,
+            STOCK.get_moving_averages_per_share().columns
         )
 
     def test_get_average_moving_averages(self):
         assert_index_equal(
-            stock.get_average_moving_averages().index,
-            stock.moving_averages.columns
+            STOCK.get_average_moving_averages().index,
+            STOCK.moving_averages.columns
         )
 
     def test_average_moving_average_differences(self):
         assert_index_equal(
-            stock.get_moving_average_differences().columns,
-            stock.get_average_moving_average_differences().index
+            STOCK.get_moving_average_differences().columns,
+            STOCK.get_average_moving_average_differences().index
         )
 
     def test_average_moving_average_ratios(self):
         assert_index_equal(
-            stock.get_average_moving_average_ratios().index,
-            stock.get_moving_average_ratios().columns
+            STOCK.get_average_moving_average_ratios().index,
+            STOCK.get_moving_average_ratios().columns
         )
 
     def test_average_per_share_differences(self):
         assert_index_equal(
-            stock.get_average_per_share_differences().index,
+            STOCK.get_average_per_share_differences().index,
             Index([
                 f'PER_SHARE_DIFF_{column}' for column in (
                     'ASSETS_DEBT',
@@ -438,9 +437,9 @@ class TestStockPup(unittest.TestCase):
 
     def test_get_median_growth_rate(self):
         self.assertEqual(
-            stock.get_median_growth_rate(),
+            STOCK.get_median_growth_rate(),
             median([
-                stock.get_moving_average_growth_rates()[f'GROWTH_NET_{column}'] for column in (
+                STOCK.get_moving_average_growth_rates()[f'GROWTH_NET_{column}'] for column in (
                     'ASSETS',
                     'CASH',
                     'CASH_INVESTED',
@@ -455,9 +454,9 @@ class TestStockPup(unittest.TestCase):
         )
 
     def test_get_median_returns(self):
-        moving_average_ratios = stock.get_moving_average_ratios()
+        moving_average_ratios = STOCK.get_moving_average_ratios()
         self.assertEqual(
-            stock.get_median_returns(),
+            STOCK.get_median_returns(),
             median([
                 moving_average_ratios[
                     f'RATIO_{column}'] for column in (
@@ -488,9 +487,9 @@ class TestStockPup(unittest.TestCase):
         )
 
     def test_get_median_safety(self):
-        safety = stock.get_average_moving_average_differences()
+        safety = STOCK.get_average_moving_average_differences()
         self.assertEqual(
-            stock.get_median_safety(),
+            STOCK.get_median_safety(),
             median([
                 safety['DIFF_ASSETS_DEBT'],
                 safety['DIFF_ASSETS_LIABILITIES'],
@@ -508,13 +507,13 @@ class TestStockPup(unittest.TestCase):
                 safety['DIFF_INCOME_LIABILITIES'],
                 safety['DIFF_TANGIBLE_DEBT'],
                 safety['DIFF_TANGIBLE_LIABILITIES'],
-                stock.get_average_moving_averages()['NET_WORKING_CAPITAL'],
+                STOCK.get_average_moving_averages()['NET_WORKING_CAPITAL'],
             ])
         )
 
     def test_get_averages(self):
         assert_index_equal(
-            stock.get_averages().index,
+            STOCK.get_averages().index,
             Index([
                 'AVERAGE_GROWTH',
                 'AVERAGE_RETURNS',
@@ -528,17 +527,16 @@ class TestStockPup(unittest.TestCase):
 
     def test_stock_summary(self):
         assert_index_equal(
-            stock.get_summary().index,
+            STOCK.get_summary().index,
             concat([
-                stock.get_averages(),
-                stock.get_average_moving_average_differences(),
-                stock.get_moving_average_growth_rates(),
-                stock.get_average_moving_averages(),
-                stock.get_average_per_share_averages(),
-                stock.get_average_per_share_differences(),
-                stock.get_average_moving_average_ratios(),
+                STOCK.get_averages(),
+                STOCK.get_average_moving_average_differences(),
+                STOCK.get_moving_average_growth_rates(),
+                STOCK.get_average_moving_averages(),
+                STOCK.get_average_per_share_averages(),
+                STOCK.get_average_per_share_differences(),
+                STOCK.get_average_moving_average_ratios(),
             ], axis=0).index
         )
         self.publish()
-
 # process files in parallel

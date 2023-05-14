@@ -1,5 +1,9 @@
-import unittest
+import jadecobra.tester
+import numpy
+import pandas
 import re
+import src.stock
+import unittest
 
 from src.stock import Stock
 from numpy import median
@@ -7,7 +11,7 @@ from pandas.testing import assert_index_equal
 from pandas.api.types import is_numeric_dtype
 from pandas import Index, MultiIndex, concat
 
-stock = Stock(source='STOCKPUP', ticker='BAC').get_stock()
+stock = src.stock.Stock(source='STOCKPUP', ticker='BAC').get_stock()
 
 
 class TestStockPup(unittest.TestCase):
@@ -535,5 +539,6 @@ class TestStockPup(unittest.TestCase):
                 stock.get_average_moving_average_ratios(),
             ], axis=0).index
         )
+        self.publish()
 
 # process files in parallel

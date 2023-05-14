@@ -20,5 +20,3 @@
 #                 f"{self.edgar.to_folder}{self.edgar.ticker}.csv"
 #             )
 #         )
-
-

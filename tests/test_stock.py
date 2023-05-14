@@ -1,19 +1,19 @@
-import unittest
+import jadecobra.tester
+import src.stock
 
-from src.stock import Stock
 
-class TestAnalyst(unittest.TestCase):
+class TestAnalyst(jadecobra.tester.TestCase):
 
     def test_default_source_is_stockpup(self):
-        self.assertEqual(Stock().source, 'STOCKPUP')
+        self.assertEqual(src.stock.Stock().source, 'STOCKPUP')
 
     def test_default_discount_rate(self):
-        self.assertEqual(Stock().discount_rate, 0.0316)
+        self.assertEqual(src.stock.Stock().discount_rate, 0.0316)
 
     def test_ticker_symbol_when_ticker_provided(self):
         def ticker():
             return 'AAPL'
-        self.assertEqual(ticker(), Stock(ticker=ticker()).ticker)
+        self.assertEqual(ticker(), src.stock.Stock(ticker=ticker()).ticker)
 
     def test_none_has_no_length(self):
         with self.assertRaises(TypeError):

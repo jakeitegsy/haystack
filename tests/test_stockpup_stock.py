@@ -533,5 +533,5 @@ class TestStockPup(jadecobra.tester.TestCase):
                 STOCK.get_average_moving_average_ratios(),
             ], axis=0).index
         )
-        self.publish()
+        
 # process files in parallel

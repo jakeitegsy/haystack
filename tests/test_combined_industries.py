@@ -3,7 +3,7 @@
 # from eden_industries import Industries
 # from eden_utilities import (
 #     ANALYSIS_FOLDER, EDGAR_FOLDER, PROCESSED_FOLDER, INDUSTRY_FOLDER,
-#     STOCKPUP_FOLDER, TEST_FOLDER, list_filetype, os, pd,
+#     STOCKPUP_FOLDER, TEST_FOLDER, list_filetype, os,
 # )
 
 # folder = f"{TEST_FOLDER}{PROCESSED_FOLDER}{ANALYSIS_FOLDER}"
@@ -67,8 +67,8 @@
 #         self.stockpup_prices = stockpup_industries.symbols.PER_SHARE_MARKET
 
 #     def test_get_current_price_returns_series(self):
-#         self.assertIs(type(self.edgar_prices), pd.Series)
-#         self.assertIs(type(self.stockpup_prices), pd.Series)
+#         self.assertIs(type(self.edgar_prices), pandas.Series)
+#         self.assertIs(type(self.stockpup_prices), pandas.Series)
 
 #     def test_prices_is_a_series_with_the_same_index_as_combined_df(self):
 #         self.assertEqual(
@@ -108,7 +108,7 @@
 
 #     def test_price_ratios_are_floats(self):
 #         [self.assertIs(
-#                 type(edgar_industries.symbols[f"{name}"]), pd.Series
+#                 type(edgar_industries.symbols[f"{name}"]), pandas.Series
 #             ) for name in self.comparisons
 #         ]
 
@@ -118,11 +118,11 @@
 #     def test_average_price_score_is_a_series(self):
 #         self.assertIs(
 #             type(edgar_industries.symbols.AVERAGE_PRICE_RATIOS),
-#             pd.Series
+#             pandas.Series
 #         )
 #         self.assertIs(
 #             type(stockpup_industries.symbols.AVERAGE_PRICE_RATIOS),
-#             pd.Series
+#             pandas.Series
 #         )
 
 

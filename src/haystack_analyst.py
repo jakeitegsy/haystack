@@ -297,7 +297,7 @@ class Analyst:
         try:
             for afile in file_list:
                 try:
-                    df = pd.read_csv(
+                    df = pandas.read_csv(
                         f"{folder}{afile}", header=header, index_col=0,
                         squeeze=True
                     )
@@ -310,7 +310,7 @@ class Analyst:
 
         combined = None
         try:
-            combined = pd.concat(df_list, axis=axis,
+            combined = pandas.concat(df_list, axis=axis,
                                 ignore_index=ignore_index, sort=False)
         except ValueError:
             pass
@@ -321,14 +321,14 @@ class Analyst:
             return combined
 
     def fix_nans(self, df):
-        fixed = df.replace([pd.np.inf, -pd.np.inf, pd.np.nan], 0)
+        fixed = df.replace([pandas.np.inf, -pandas.np.inf, pandas.np.nan], 0)
         return fixed
 
     def fix_index(self, df):
         if self.source.upper() == "STOCKPUP":
-            if type(df.index) is not pd.MultiIndex:
-                df = df.set_index([pd.Index(df.index.year, name="YEAR"),
-                                   pd.Index(df.index.quarter,
+            if type(df.index) is not pandas.MultiIndex:
+                df = df.set_index([pandas.Index(df.index.year, name="YEAR"),
+                                   pandas.Index(df.index.quarter,
                                                         name="QUARTER")])
 
         if self.source.upper() == "EDGAR":
@@ -360,7 +360,7 @@ class Analyst:
         today = datetime.date.today()
         prices_today = f"prices/{str(today)}_current_prices.pkl"
         try:
-            current_prices = pd.read_pickle(prices_today)
+            current_prices = pandas.read_pickle(prices_today)
         except FileNotFoundError:
             try:
                 prices = self.yahoo_finance_download(
@@ -379,7 +379,7 @@ class Analyst:
             last_known_prices = sorted(
                 list_filetype(in_folder="prices", extension="pkl")
             )[-1]
-            return pd.read_pickle(last_known_prices)
+            return pandas.read_pickle(last_known_prices)
 
         return current_prices
 
@@ -390,7 +390,7 @@ class Analyst:
         x = numerator
         y = denominator
 
-        if type(x) == pd.Series and type(y) == pd.Series:
+        if type(x) == pandas.Series and type(y) == pandas.Series:
             # returns -abs(y) when x is 0
             ratio1 = -abs(y[x == 0])
             # returns -abs(x/y) when y is negative
@@ -401,7 +401,7 @@ class Analyst:
             ratio5 = x[(x > 0) & (y == 0)]
             # regular ratio
             ratio6 = x[(x > 0) & (y > 0)] / y[(x > 0) & (y > 0)]
-            return pd.concat([ratio1, ratio2, ratio3,
+            return pandas.concat([ratio1, ratio2, ratio3,
                               ratio4, ratio5, ratio6],
                               axis=0)
         else:
@@ -527,7 +527,7 @@ class Analyst:
         return score / max(score)
 
     def score_price_ratios(self, df):
-        price_ratios = pd.np.mean([
+        price_ratios = pandas.np.mean([
             df.RATIO_CASH_PRICE,
             df.RATIO_DCF_SHY_FORWARD_PRICE,
             df.RATIO_DCF_SHY_HISTORIC_PRICE,
@@ -540,12 +540,12 @@ class Analyst:
 
     def transform_dict(self, data_dict):
         try:
-            output = pd.DataFrame(data_dict)
+            output = pandas.DataFrame(data_dict)
         except ValueError:
-            output = pd.Series(data_dict)
-        except pd.core.indexes.base.InvalidIndexError:
-            output = pd.DataFrame.from_dict(
-                data_dict, orient='index', dtype=pd.np.float64
+            output = pandas.Series(data_dict)
+        except pandas.core.indexes.base.InvalidIndexError:
+            output = pandas.DataFrame.from_dict(
+                data_dict, orient='index', dtype=pandas.np.float64
             ).T.drop_duplicates(keep='last')
 
         try:
@@ -600,7 +600,7 @@ class AssignSector(Analyst):
             "XLU": "UTILITIES"
         }
 
-        self.symbols = pd.read_csv(
+        self.symbols = pandas.read_csv(
             self.filename, header=1,
             usecols=["Symbol", "Company Name"], index_col="Symbol"
         )
@@ -623,7 +623,7 @@ class AssignIndustry(Analyst):
                          to_folder=to_folder,
                          from_folder=utilities.industry_folder())
         self.folder = to_folder
-        self.symbols = pd.read_csv(
+        self.symbols = pandas.read_csv(
             self.filename,
             usecols=["Symbol", "Name", "Sector", "Industry"],
             index_col="Symbol"

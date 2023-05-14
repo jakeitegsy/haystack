@@ -11,13 +11,13 @@ class TestGetCurrentPrices(unittest.TestCase):
 
     def test_get_current_prices_returns_dataframe_with_one_symbol(self):
         self.assertIs(
-            type(self.prices(symbols="YUM")), pd.DataFrame
+            type(self.prices(symbols="YUM")), pandas.DataFrame
         )
 
     def test_get_current_prices_returns_dataframe_with_more_than_one_symbol(self):
         self.assertIs(
             type(self.prices(symbols=["AMZN" ,"GOOG"])),
-            pd.DataFrame
+            pandas.DataFrame
         )
 
 

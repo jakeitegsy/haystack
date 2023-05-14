@@ -25,3 +25,4 @@ class TestWriteReports(jadecobra.tester.TestCase):
 
     def test_write_report_returns_a_message_when_df_is_none(self):
         self.assertEqual(src.utilities.write_report(), "Invalid operation for NoneType")
+        self.publish()

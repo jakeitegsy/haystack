@@ -65,8 +65,8 @@ class TestPrices(unittest.TestCase):
         self.stockpup_prices = stockpup_sectors.symbols.PER_SHARE_MARKET
 
     def test_get_current_price_returns_series(self):
-        self.assertIs(type(self.edgar_prices), pd.Series)
-        self.assertIs(type(self.stockpup_prices), pd.Series)
+        self.assertIs(type(self.edgar_prices), pandas.Series)
+        self.assertIs(type(self.stockpup_prices), pandas.Series)
 
     def test_prices_is_a_series_with_the_same_index_as_combined_df(self):
         self.assertEqual(
@@ -105,7 +105,7 @@ class TestPriceRatios(unittest.TestCase):
 
     def test_price_ratios_are_floats(self):
         [self.assertIs(
-                type(edgar_sectors.symbols[f"{name}"]), pd.Series
+                type(edgar_sectors.symbols[f"{name}"]), pandas.Series
             ) for name in self.comparisons
         ]
 
@@ -114,10 +114,10 @@ class TestAveragePriceScore(unittest.TestCase):
 
     def test_average_price_score_is_a_series(self):
         self.assertIs(
-            type(edgar_sectors.symbols.AVERAGE_PRICE_RATIOS), pd.Series
+            type(edgar_sectors.symbols.AVERAGE_PRICE_RATIOS), pandas.Series
         )
         self.assertIs(
-            type(stockpup_sectors.symbols.AVERAGE_PRICE_RATIOS), pd.Series
+            type(stockpup_sectors.symbols.AVERAGE_PRICE_RATIOS), pandas.Series
         )
 
 @unittest.skip

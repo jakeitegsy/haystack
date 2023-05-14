@@ -22,7 +22,7 @@ class TestAssignIndustries(unittest.TestCase):
         self.symbols = self.industry.symbols
 
     def test_read_industry_and_symbols_returns_dataframe(self):
-        self.assertIs(type(self.symbols), pd.DataFrame)
+        self.assertIs(type(self.symbols), pandas.DataFrame)
 
     def test_column_names(self):
         self.assertEqual(

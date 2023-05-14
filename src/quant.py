@@ -1,8 +1,8 @@
 def calc_growth(self, dataframe, using="simple"):
     "Return Simple or Compound Growth Rate"
-    if using == "compound":            
+    if using == "compound":
         try:
-            avg = (((dataframe.iloc[-1] / dataframe.iloc[0]) 
+            avg = (((dataframe.iloc[-1] / dataframe.iloc[0])
                     ** (1 / (dataframe.shape[0] - 1))) - 1)
         except ZeroDivisionError:
             avg = dataframe.pct_change(axis=0)
@@ -13,7 +13,7 @@ def calc_growth(self, dataframe, using="simple"):
     avg = self.correct_columns(avg, prefix="GROWTH_")
     return avg
 
-def combine_files(self, folder, ext="csv", header=None, 
+def combine_files(self, folder, ext="csv", header=None,
                       axis=0, file_col="Symbol", ignore_index=False):
         "Returns dataframe of csv files in folder"
         file_col = file_col.upper()
@@ -23,7 +23,7 @@ def combine_files(self, folder, ext="csv", header=None,
         try:
             for afile in file_list:
                 try:
-                    dataframe = pd.read_csv(
+                    dataframe = pandas.read_csv(
                         f"{folder}{afile}", header=header, index_col=0,
                         squeeze=True
                     )
@@ -86,12 +86,12 @@ def get_current_prices(self, symbols="", dataframe=None):
         tickers = dataframe.index
     except AttributeError:
         tickers = symbols
-    
+
     today = datetime.date.today()
     prices_today = f"prices/{str(today)}_current_prices.pkl"
     try:
-        current_prices = pd.read_pickle(prices_today)
-    except FileNotFoundError:            
+        current_prices = pandas.read_pickle(prices_today)
+    except FileNotFoundError:
         try:
             prices = self.yahoo_finance_download(
                 tickers=tickers, start=today,
@@ -109,11 +109,11 @@ def get_current_prices(self, symbols="", dataframe=None):
         last_known_prices = sorted(
             list_filetype(in_folder="prices", extension="pkl")
         )[-1]
-        return pd.read_pickle(last_known_prices)
+        return pandas.read_pickle(last_known_prices)
 
     return current_prices
 
-def get_ticker_and_filename(self, filename=None, ticker=None, 
+def get_ticker_and_filename(self, filename=None, ticker=None,
                             folder=None):
     if filename is not None:
         ticker = os.path.split(filename)[1].split(".")[0]
@@ -152,11 +152,11 @@ def score(self, safety=4, growth=2, price=1, dataframe=None):
 
     score = sum(
         [safety_score, returns_score, growth_score, price_score]
-    ) 
+    )
     return score / max(score)
 
 def score_price_ratios(self, dataframe):
-    price_ratios = pd.np.mean([
+    price_ratios = pandas.np.mean([
         dataframe.RATIO_CASH_PRICE,
         dataframe.RATIO_DCF_SHY_FORWARD_PRICE,
         dataframe.RATIO_DCF_SHY_HISTORIC_PRICE,
@@ -175,11 +175,11 @@ def sort_index(self, dataframe):
 
 def transform_dict(self, dictionary):
     try:
-        result = pd.DataFrame(dictionary)
+        result = pandas.DataFrame(dictionary)
     except ValueError:
-        result = pd.Series(dictionary)
-    except pd.core.indexes.base.InvalidIndexError:
-        result = pd.DataFrame.from_dict(
-            dictionary, orient='index', dtype=pd.np.float64
+        result = pandas.Series(dictionary)
+    except pandas.core.indexes.base.InvalidIndexError:
+        result = pandas.DataFrame.from_dict(
+            dictionary, orient='index', dtype=pandas.np.float64
         ).T.drop_duplicates(keep='last')
     return sort_index(result)

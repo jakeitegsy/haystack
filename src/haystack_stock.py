@@ -8,14 +8,14 @@ from scipy.stats import hmean
 
 class Stock:
 
-    def __init__(self, ticker=None, filename=None, 
-                 from_folder=f"{PROCESSED_FOLDER}{EDGAR_FOLDER}", 
+    def __init__(self, ticker=None, filename=None,
+                 from_folder=f"{PROCESSED_FOLDER}{EDGAR_FOLDER}",
                  to_folder=f"{PROCESSED_FOLDER}{ANALYSIS_FOLDER}",
-                 source=None, 
+                 source=None,
                  index_col=None,
                  doc_type="10-K"):
         self.analyst = Analyst(
-            ticker=ticker, filename=filename, to_folder=to_folder, 
+            ticker=ticker, filename=filename, to_folder=to_folder,
             from_folder=from_folder, source=source
         )
 
@@ -24,7 +24,7 @@ class Stock:
         self.filename = self.analyst.filename
 
         try:
-            self.data = pd.read_csv(
+            self.data = pandas.read_csv(
                 self.filename,
                 header=0,
                 index_col=index_col,
@@ -34,9 +34,9 @@ class Stock:
             )
             if len(self.data) <= 1:
                 self.data = None
-        except (ValueError, pd.errors.EmptyDataError):
+        except (ValueError, pandas.errors.EmptyDataError):
             self.data = None
-        
+
         if self.data is not None:
             self.fixed = self.analyst.fix_index(self.data.copy())
             self.renamed = self.analyst.rename_columns(self.fixed)
@@ -72,7 +72,7 @@ class Stock:
                 # PER SHARE
                 self.per_share = self.analyst.calc_per_share(self.mavg)
                 self.per_share_diffs = self.analyst.rename_columns(
-                    self.diffs.div(self.net.NET_SHARES, axis=0), 
+                    self.diffs.div(self.net.NET_SHARES, axis=0),
                     prefix="PER_SHARE_"
                 )
 
@@ -80,7 +80,7 @@ class Stock:
                 self.mavg_avg = self.mavg.iloc[-1]
                 self.mavg_avg.NET_TANGIBLE = (
                     self.mavg_avg.NET_ASSETS
-                 - (self.mavg_avg.NET_LIABILITIES + 
+                 - (self.mavg_avg.NET_LIABILITIES +
                     self.mavg_avg.NET_GOODWILL)
                 )
                 self.diffs_avg = self.analyst.calc_diffs(self.mavg_avg)
@@ -91,7 +91,7 @@ class Stock:
 
                 # Per Share Averages
                 self.per_share_diffs_avg = self.analyst.rename_columns(
-                    (self.diffs_avg / self.mavg_avg.NET_SHARES), 
+                    (self.diffs_avg / self.mavg_avg.NET_SHARES),
                     prefix="PER_SHARE_"
                 )
                 self.per_share_avg = self.per_share.iloc[-1]
@@ -100,8 +100,8 @@ class Stock:
                 diff = self.diffs_avg
                 growth = self.growth_avg
 
-                self.averages = pd.Series({
-                    "AVERAGE_GROWTH": pd.np.mean([
+                self.averages = pandas.Series({
+                    "AVERAGE_GROWTH": pandas.np.mean([
                         growth.GROWTH_NET_ASSETS,
                         growth.GROWTH_NET_CASH,
                         growth.GROWTH_NET_CASH_INV,
@@ -112,7 +112,7 @@ class Stock:
                         growth.GROWTH_NET_REVENUE,
                         growth.GROWTH_NET_TANGIBLE,
                     ]),
-                    "AVERAGE_RETURNS": pd.np.mean([
+                    "AVERAGE_RETURNS": pandas.np.mean([
                         avg.RATIO_INCOME_ASSETS,
                         avg.RATIO_INCOME_EQUITY,
                         avg.RATIO_INCOME_EXPENSES,
@@ -129,7 +129,7 @@ class Stock:
                         avg.RATIO_FCF_SHY_INVESTED_CAP,
                         avg.RATIO_FCF_SHY_TANGIBLE,
                     ]),
-                    "AVERAGE_SAFETY": pd.np.mean([
+                    "AVERAGE_SAFETY": pandas.np.mean([
                         diff.DIFF_ASSETS_DEBT,
                         diff.DIFF_ASSETS_LIABILITIES,
                         diff.DIFF_CASH_DEBT,
@@ -148,21 +148,21 @@ class Stock:
                         diff.DIFF_TANGIBLE_DEBT,
                         diff.DIFF_TANGIBLE_LIABILITIES,
                     ]),
-                    "DATA_END":  self.year_start_end(self.mavg, 
+                    "DATA_END":  self.year_start_end(self.mavg,
                                                      period="END"),
-                    "DATA_START": self.year_start_end(self.mavg, 
+                    "DATA_START": self.year_start_end(self.mavg,
                                                       period="START"),
                     "PER_SHARE_DCF_FORWARD": (
-                        self.per_share_avg.PER_SHARE_NET_FCF / 
+                        self.per_share_avg.PER_SHARE_NET_FCF /
                         self.analyst.rate
                     ),
                     "PER_SHARE_DCF_SHY_FORWARD": (
-                        self.per_share_avg.PER_SHARE_NET_FCF_SHY / 
+                        self.per_share_avg.PER_SHARE_NET_FCF_SHY /
                         self.analyst.rate
                     ),
                 })
 
-                self.summary = pd.concat([
+                self.summary = pandas.concat([
                     self.averages,
                     self.diffs_avg,
                     self.growth_avg,
@@ -171,7 +171,7 @@ class Stock:
                     self.per_share_diffs_avg,
                     self.ratios_avg,
                 ], axis=0)
-            
+
                 try:
                     del self.summary.GROWTH_NET_SHARES
                 except Exception:
@@ -193,25 +193,25 @@ class Stock:
 
 class Stockpup(Stock):
 
-    def __init__(self, ticker=None, filename=None, 
+    def __init__(self, ticker=None, filename=None,
                  from_folder=f"{PROCESSED_FOLDER}{STOCKPUP_FOLDER}",
                  to_folder=None,
                  source="STOCKPUP",
                  index_col="Quarter end",
                  ):
-        super().__init__(ticker=ticker, filename=filename, 
-                     from_folder=from_folder, to_folder=to_folder, 
+        super().__init__(ticker=ticker, filename=filename,
+                     from_folder=from_folder, to_folder=to_folder,
                      source=source, index_col=index_col)
 
 
 class Edgar(Stock):
 
-    def __init__(self, ticker=None, filename=None, 
+    def __init__(self, ticker=None, filename=None,
                  from_folder=f"{PROCESSED_FOLDER}{EDGAR_FOLDER}",
                  to_folder=None,
                  source="EDGAR",
                  index_col="fiscal_year",
                  ):
         super().__init__(ticker=ticker, filename=filename,
-                         from_folder=from_folder, to_folder=to_folder, 
+                         from_folder=from_folder, to_folder=to_folder,
                          source=source, index_col=index_col)

@@ -729,7 +729,7 @@ class AssignIndustry(Stock):
                          to_folder=to_folder,
                          from_folder=industry_folder)
         self.folder = to_folder
-        self.symbols = pd.read_csv(
+        self.symbols = pandas.read_csv(
             self.filename,
             usecols=["Symbol", "Name", "Sector", "Industry"],
             index_col="Symbol"

@@ -4,7 +4,7 @@
 # from eden_utilities import (
 #     ANALYSIS_FOLDER, EDGAR_FOLDER, PROCESSED_FOLDER, INDUSTRY_FOLDER,
 #     STOCKPUP_FOLDER, TEST_FOLDER,
-#     janitor, list_filetype, os, pd, random_file, random_ticker,
+#     janitor, list_filetype, os,  random_file, random_ticker,
 #     test_prep
 # )
 
@@ -38,7 +38,7 @@
 # class TestScores(TestSectorQuery):
 
 #     def series_test(self, df):
-#         self.assertIs(type(df), pd.Series)
+#         self.assertIs(type(df), pandas.Series)
 #         self.assertEqual(str(df.dtypes), 'float64')
 
 #     def setUp(self):

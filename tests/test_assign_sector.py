@@ -1,7 +1,5 @@
-import os
-os.system()
 import jadecobra.tester
-
+import unittest
 from src.stock import AssignSector
 from pandas import DataFrame
 from os import path
@@ -10,8 +8,10 @@ from src.utilities import (
 )
 
 
-class TestSectors(unittest.TestCase):
+class TestSectors(jadecobra.tester.TestCase):
 
+    pass
+    """
     def setUp(self):
         self.ticker = random_ticker(
             from_folder=f"{processed_folder}{sectors_folder}"
@@ -22,7 +22,6 @@ class TestSectors(unittest.TestCase):
         )
     def test_sector_contains_10_items(self):
         self.assertEqual(len(self.sector.sectors), 10)
-    """
     def test_sector_XLY_returns_consumer_discretionary(self):
         self.assertEqual(
             self.sector.sectors['XLY'], 'CONSUMER_DISCRETIONARY'

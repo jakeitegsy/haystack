@@ -5,3 +5,4 @@ sniffer
 scipy
 urllib3
 yfinance
+jadecobra
